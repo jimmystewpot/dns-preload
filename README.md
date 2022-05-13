@@ -13,17 +13,18 @@ Can be added to crontab as a user `crontab -e`
 `@reboot $HOME/dns-preload all --config-file=dns-preload.yaml --full --quiet --server=::1`
 
 replace $HOME with where you have placed the executable.
-### configuration
+### cCnfiguration
 
 An example configuration file can be found at `example-config.yaml` in the root of the repository.
 
-## why?
+## Why?
 
-900ms latency on a slow satellite connection was very frustrating, improving the lookup times by pre-fetching all of the NS and other recorrds.
-plus some % of needing something to do while on a very slow crappy internet connection in a remote area on a train.
+With an intermittent satellite connection when the connection is lost the local DNS cache is flushed. When the connection is restablished the high latency on the link causes a slow down for all connections being reestablished. This was an easy way to update the cache asynchronously when the connection is restored which improves usability of the whole system.
+
+It also works well on trains with crappy reception.
 
 
-## help
+## Help
 
 ```
 dns-preload --help
