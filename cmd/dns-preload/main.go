@@ -68,38 +68,27 @@ func (p *Preload) Run(cmd string) error {
 	}
 	ctx := context.Background()
 	switch cmd {
-	case "all":
-		e := make([]error, 0)
-		for _, query := range confighandlers.QueryTypes {
-			err := p.Run(query)
-			if err != nil {
-				e = append(e, err)
-			}
-		}
-		if len(e) != 0 {
-			return fmt.Errorf("%s", e)
-		}
-	case "cname":
+	case confighandlers.Cname:
 		if cfg.QueryType.CnameCount != 0 {
 			fmt.Printf(preloadMessage, p.nameserver, cnameTypeStr, strings.Join(cfg.QueryType.Cname, ", "))
 			return p.CNAME(ctx, cfg.QueryType.Cname)
 		}
-	case "hosts":
+	case confighandlers.Hosts:
 		if cfg.QueryType.HostsCount != 0 {
 			fmt.Printf(preloadMessage, p.nameserver, aTypeStr, strings.Join(cfg.QueryType.Hosts, ", "))
 			return p.Hosts(ctx, cfg.QueryType.Hosts)
 		}
-	case "mx":
+	case confighandlers.Mx:
 		if cfg.QueryType.MXCount != 0 {
 			fmt.Printf(preloadMessage, p.nameserver, mxTypeStr, strings.Join(cfg.QueryType.MX, ", "))
 			return p.MX(ctx, cfg.QueryType.MX)
 		}
-	case "ns":
+	case confighandlers.Ns:
 		if cfg.QueryType.NSCount != 0 {
 			fmt.Printf(preloadMessage, p.nameserver, nsTypeStr, strings.Join(cfg.QueryType.NS, ", "))
 			return p.NS(ctx, cfg.QueryType.NS)
 		}
-	case "txt":
+	case confighandlers.Txt:
 		if cfg.QueryType.TXTCount != 0 {
 			fmt.Printf(preloadMessage, p.nameserver, txtTypeStr, strings.Join(cfg.QueryType.TXT, ", "))
 			return p.TXT(ctx, cfg.QueryType.TXT)
@@ -216,7 +205,7 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 		return fmt.Errorf("error: got type %+v", r.(string))
 	}
 	if p.Full {
-		if (qtype == "mx") || (qtype == "ns") {
+		if (qtype == confighandlers.Mx) || (qtype == confighandlers.Ns) {
 			err := p.Hosts(context.Background(), str)
 			if err != nil {
 				return err
@@ -239,10 +228,27 @@ func main() {
 			Compact: true,
 		}),
 	)
-	err := cmd.Run(cmd.Command())
-	if err != nil {
-		fmt.Println(err)
+	switch cmd.Command() {
+	case "all":
+		e := make([]error, 0)
+		for _, queryType := range confighandlers.QueryTypes {
+			err := cmd.Run(queryType)
+			if err != nil {
+				e = append(e, err)
+			}
+		}
+		if len(e) != 0 {
+			fmt.Println(e)
+			cmd.FatalIfErrorf(e[0])
+			fmt.Printf("Preload unsuccessful in %s\n", time.Since(start))
+			cmd.Exit(1)
+		}
+	default:
+		err := cmd.Run(cmd.Command())
+		if err != nil {
+			fmt.Println(err)
+		}
+		cmd.FatalIfErrorf(err)
+		fmt.Printf("Preload completed in %s\n", time.Since(start))
 	}
-	cmd.FatalIfErrorf(err)
-	fmt.Printf("Preload completed in %s\n", time.Since(start))
 }

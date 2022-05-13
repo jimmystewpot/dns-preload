@@ -8,9 +8,17 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const (
+	Mx    string = "mx"
+	Ns    string = "ns"
+	Txt   string = "txt"
+	Cname string = "cname"
+	Hosts string = "hosts"
+)
+
 var (
 	// queryTypes is used to iterate through all of the commands when the all cmd is used.
-	QueryTypes = []string{"hosts", "cname", "mx", "ns", "txt"}
+	QueryTypes = []string{Hosts, Cname, Mx, Ns, Txt}
 )
 
 type Configuration struct {
