@@ -1,2 +1,0 @@
-{"Time":"2022-05-13T09:30:59.067063604Z","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"?   \tgithub.com/jimmystewpot/dns-preload/cmd/dns-preload\t[no test files]\n"}
-{"Time":"2022-05-13T09:30:59.06834628Z","Action":"skip","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Elapsed":0.001}

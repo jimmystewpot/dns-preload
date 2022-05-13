@@ -1,6 +1,7 @@
 package confighandlers
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -67,4 +68,133 @@ func TestLoadConfigFromFile(t *testing.T) {
 
 func ptr(s string) *string {
 	return &s
+}
+
+func TestQueryList_PopulateCounts(t *testing.T) {
+	type fields struct {
+		QueryType QueryType
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    fields
+		wantErr bool
+	}{
+		{
+			name: "Simple test",
+			fields: fields{
+				QueryType{
+					Cname: []string{"one", "two"},
+				},
+			},
+			want: fields{
+				QueryType{
+					CnameCount: uint16(2),
+				},
+			},
+		},
+		{
+			name: "zero test",
+			fields: fields{
+				QueryType{
+					Cname: []string{},
+				},
+			},
+			want: fields{
+				QueryType{
+					CnameCount: uint16(0),
+				},
+			},
+		},
+		{
+			name: "overload test cname",
+			fields: fields{
+				QueryType{
+					Cname: garbage(100000000),
+				},
+			},
+			want: fields{
+				QueryType{
+					CnameCount: uint16(0),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "overload test hosts",
+			fields: fields{
+				QueryType{
+					Hosts: garbage(100000000),
+				},
+			},
+			want: fields{
+				QueryType{
+					HostsCount: uint16(0),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "overload test mx",
+			fields: fields{
+				QueryType{
+					MX: garbage(100000000),
+				},
+			},
+			want: fields{
+				QueryType{
+					MXCount: uint16(0),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "overload test ns",
+			fields: fields{
+				QueryType{
+					NS: garbage(100000000),
+				},
+			},
+			want: fields{
+				QueryType{
+					NSCount: uint16(0),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "overload test txt",
+			fields: fields{
+				QueryType{
+					TXT: garbage(100000000),
+				},
+			},
+			want: fields{
+				QueryType{
+					TXTCount: uint16(0),
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ql := &QueryList{
+				QueryType: tt.fields.QueryType,
+			}
+			err := ql.PopulateCounts()
+			if (err != nil) && (tt.wantErr == false) {
+				t.Errorf("got error %s when we did not expect it", err)
+			}
+			if ql.QueryType.CnameCount != tt.want.QueryType.CnameCount {
+				t.Errorf("expected %d got %d", tt.want.QueryType.CnameCount, ql.QueryType.CnameCount)
+			}
+		})
+	}
+}
+
+func garbage(s int64) []string {
+	x := make([]string, s)
+	fmt.Println(len(x))
+	return x
 }

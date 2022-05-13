@@ -14,11 +14,12 @@ import (
 
 const (
 	// these const strings are used to store the DNS query types for reuse.
-	aType     string = "A, AAAA"
-	cnameType string = "CNAME"
-	mxType    string = "MX"
-	nsType    string = "NS"
-	txtType   string = "TXT"
+	aTypeStr       string = "A, AAAA"
+	cnameTypeStr   string = "CNAME"
+	mxTypeStr      string = "MX"
+	nsTypeStr      string = "NS"
+	txtTypeStr     string = "TXT"
+	preloadMessage string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
 )
 
 var (
@@ -30,9 +31,8 @@ var (
 		Ns    Preload `cmd:""`
 		Txt   Preload `cmd:""`
 	}
-	// queryTypes is used to iterate through all of the commands when the all cmd is used.
-	queryTypes = []string{"hosts", "cname", "mx", "ns", "txt"}
-	start      time.Time
+
+	start time.Time
 )
 
 type Preload struct {
@@ -45,15 +45,16 @@ type Preload struct {
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
 	Delay      time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
 	resolver   *net.Resolver
+	nameserver string
 }
 
-func (p *Preload) Run(qtype string) error {
+func (p *Preload) Run(cmd string) error {
 	cfg, err := confighandlers.LoadConfigFromFile(&p.ConfigFile)
 	if err != nil {
 		return err
 	}
-	start = time.Now()
-	nameserver := net.JoinHostPort(p.Server, p.Port)
+
+	p.nameserver = net.JoinHostPort(p.Server, p.Port)
 	p.resolver = &net.Resolver{
 		PreferGo:     true,
 		StrictErrors: true,
@@ -61,15 +62,14 @@ func (p *Preload) Run(qtype string) error {
 			d := net.Dialer{
 				Timeout: p.Timeout,
 			}
-			return d.DialContext(ctx, network, nameserver)
+			return d.DialContext(ctx, network, p.nameserver)
 		},
 	}
 	ctx := context.Background()
-
-	switch qtype {
+	switch cmd {
 	case "all":
 		e := make([]error, 0)
-		for _, query := range queryTypes {
+		for _, query := range confighandlers.QueryTypes {
 			err := p.Run(query)
 			if err != nil {
 				e = append(e, err)
@@ -79,48 +79,34 @@ func (p *Preload) Run(qtype string) error {
 			return fmt.Errorf("%s", e)
 		}
 	case "cname":
-		if !Starter(nameserver, qtype, cfg.QueryType.Cname) {
-			return nil
+		if cfg.QueryType.CnameCount != 0 {
+			fmt.Printf(preloadMessage, p.nameserver, cnameTypeStr, strings.Join(cfg.QueryType.Cname, ", "))
+			return p.CNAME(ctx, cfg.QueryType.Cname)
 		}
-		return p.CNAME(ctx, cfg.QueryType.Cname)
 	case "hosts":
-		if !Starter(nameserver, aType, cfg.QueryType.Hosts) {
-			return nil
+		if cfg.QueryType.HostsCount != 0 {
+			fmt.Printf(preloadMessage, p.nameserver, aTypeStr, strings.Join(cfg.QueryType.Hosts, ", "))
+			return p.Hosts(ctx, cfg.QueryType.Hosts)
 		}
-		return p.Hosts(ctx, cfg.QueryType.Hosts)
 	case "mx":
-		if !Starter(nameserver, qtype, cfg.QueryType.MX) {
-			return nil
+		if cfg.QueryType.MXCount != 0 {
+			fmt.Printf(preloadMessage, p.nameserver, mxTypeStr, strings.Join(cfg.QueryType.MX, ", "))
+			return p.MX(ctx, cfg.QueryType.MX)
 		}
-		return p.MX(ctx, cfg.QueryType.MX)
 	case "ns":
-		if !Starter(nameserver, qtype, cfg.QueryType.NS) {
-			return nil
+		if cfg.QueryType.NSCount != 0 {
+			fmt.Printf(preloadMessage, p.nameserver, nsTypeStr, strings.Join(cfg.QueryType.NS, ", "))
+			return p.NS(ctx, cfg.QueryType.NS)
 		}
-		return p.NS(ctx, cfg.QueryType.NS)
 	case "txt":
-		if !Starter(nameserver, qtype, cfg.QueryType.TXT) {
-			return nil
+		if cfg.QueryType.TXTCount != 0 {
+			fmt.Printf(preloadMessage, p.nameserver, txtTypeStr, strings.Join(cfg.QueryType.TXT, ", "))
+			return p.TXT(ctx, cfg.QueryType.TXT)
 		}
-		return p.TXT(ctx, cfg.QueryType.TXT)
-		//default:
-		//	return fmt.Errorf("%s incorrect command", qtype)
+	default:
+		return fmt.Errorf("%s unknown command", cmd)
 	}
 	return nil
-}
-
-// Starter outputs what domains and query types we are about to preload on the nameserver.
-func Starter(srv string, qtype string, hosts ...[]string) bool {
-	tmp := []string{}
-	for i := 0; i < len(hosts); i++ {
-		tmp = append(tmp, hosts[i]...)
-	}
-	// if the slice has zero entries return false, there is no configured host to preload.
-	if len(tmp) == 0 {
-		return false
-	}
-	fmt.Printf("Preloading Nameserver: %s with query type: %s for domains: %s\n", srv, qtype, strings.Join(tmp, ", "))
-	return true
 }
 
 // Hosts preload the nameserver with IP addresses for a given list of hostnames.
@@ -131,7 +117,7 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], aType, time.Since(s), result)
+		err = p.Printer(hosts[i], aTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -147,7 +133,7 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], cnameType, time.Since(s), result)
+		err = p.Printer(hosts[i], cnameTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -163,7 +149,7 @@ func (p *Preload) NS(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], nsType, time.Since(s), result)
+		err = p.Printer(hosts[i], nsTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -180,7 +166,7 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 			return err
 		}
 
-		err = p.Printer(hosts[i], mxType, time.Since(s), result)
+		err = p.Printer(hosts[i], mxTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -196,7 +182,7 @@ func (p *Preload) TXT(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], txtType, time.Since(s), result)
+		err = p.Printer(hosts[i], txtTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -247,6 +233,7 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 }
 
 func main() {
+	start = time.Now()
 	cmd := kong.Parse(&cli,
 		kong.Name(os.Args[0]),
 		kong.Description("Preload a series of Domain Names into a DNS server from a yaml configuration"),

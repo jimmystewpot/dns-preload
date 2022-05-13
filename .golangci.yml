@@ -64,7 +64,7 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - golint
+    - revive
     - gomnd
     - goprintffuncname
     - gosec
@@ -77,7 +77,7 @@ linters:
     - nakedret
     - nolintlint
     - rowserrcheck
-    - scopelint
+    - exportloopref
     - staticcheck
     - structcheck
     - stylecheck
