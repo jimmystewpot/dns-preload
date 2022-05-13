@@ -10,7 +10,7 @@ with the entries that you wish to use.
 
 Can be added to crontab as a user `crontab -e`
 
-`@reboot $HOME/dns-preload all --config-file==dns-preload.yaml --full --quiet --server=::1`
+`@reboot $HOME/dns-preload all --config-file=dns-preload.yaml --full --quiet --server=::1`
 
 replace $HOME with where you have placed the executable.
 ### configuration
