@@ -24,12 +24,12 @@ const (
 
 var (
 	cli struct {
-		All   Preload `cmd:""`
-		Cname Preload `cmd:""`
-		Hosts Preload `cmd:""`
-		Mx    Preload `cmd:""`
-		Ns    Preload `cmd:""`
-		Txt   Preload `cmd:""`
+		All   Preload `cmd:"" help:"preload all of the following types from the configuration file"`
+		Cname Preload `cmd:"" help:"preload only the cname entries from the configuration file"`
+		Hosts Preload `cmd:"" help:"preload only the hosts entries from the configuration file, this does an A and AAAA lookup"`
+		Mx    Preload `cmd:"" help:"preload only the mx entries from the configuration file"`
+		Ns    Preload `cmd:"" help:"preload only the ns entries from the configuration file"`
+		Txt   Preload `cmd:"" help:"preload only the txt entries from the configuration file"`
 	}
 
 	start time.Time
