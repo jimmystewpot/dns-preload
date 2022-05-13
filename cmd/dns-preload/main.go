@@ -203,22 +203,10 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 	case []*net.MX:
 		for _, mx := range results.([]*net.MX) {
 			str = append(str, mx.Host)
-			if p.Full {
-				err := p.Hosts(context.Background(), str)
-				if err != nil {
-					return err
-				}
-			}
 		}
 	case []*net.NS:
 		for _, ns := range results.([]*net.NS) {
 			str = append(str, ns.Host)
-			if p.Full {
-				err := p.Hosts(context.Background(), str)
-				if err != nil {
-					return err
-				}
-			}
 		}
 	case []net.IPAddr:
 		for _, ip := range results.([]net.IPAddr) {
@@ -226,6 +214,14 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 		}
 	default:
 		return fmt.Errorf("error: got type %+v", r.(string))
+	}
+	if p.Full {
+		if (qtype == "mx") || (qtype == "ns") {
+			err := p.Hosts(context.Background(), str)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	if !p.Quiet {
 		fmt.Printf("Preloaded %s type %s in %s to %+s\n", hostname, qtype, duration, strings.Join(str, ", "))

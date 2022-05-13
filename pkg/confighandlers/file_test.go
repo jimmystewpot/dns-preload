@@ -70,7 +70,7 @@ func ptr(s string) *string {
 	return &s
 }
 
-func TestQueryList_PopulateCounts(t *testing.T) {
+func TestQueryListPopulateCounts(t *testing.T) {
 	type fields struct {
 		QueryType QueryType
 	}
