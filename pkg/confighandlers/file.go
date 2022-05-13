@@ -13,7 +13,7 @@ var (
 	QueryTypes = []string{"hosts", "cname", "mx", "ns", "txt"}
 )
 
-type QueryList struct {
+type Configuration struct {
 	QueryType QueryType `yaml:"query_type" json:"query_type"`
 }
 
@@ -37,33 +37,33 @@ type QueryType struct {
 }
 
 // ReadConfig wil read the YAML file from disk and render it into the DomainConfig struct.
-func (ql *QueryList) LoadConfig(r io.Reader) error {
-	err := yaml.NewDecoder(r).Decode(ql)
+func (cfg *Configuration) LoadConfig(r io.Reader) error {
+	err := yaml.NewDecoder(r).Decode(cfg)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (ql *QueryList) PopulateCounts() error {
+func (cfg *Configuration) PopulateCounts() error {
 	var err error
-	ql.QueryType.CnameCount, err = count(ql.QueryType.Cname)
+	cfg.QueryType.CnameCount, err = count(cfg.QueryType.Cname)
 	if err != nil {
 		return err
 	}
-	ql.QueryType.HostsCount, err = count(ql.QueryType.Hosts)
+	cfg.QueryType.HostsCount, err = count(cfg.QueryType.Hosts)
 	if err != nil {
 		return err
 	}
-	ql.QueryType.NSCount, err = count(ql.QueryType.NS)
+	cfg.QueryType.NSCount, err = count(cfg.QueryType.NS)
 	if err != nil {
 		return err
 	}
-	ql.QueryType.MXCount, err = count(ql.QueryType.MX)
+	cfg.QueryType.MXCount, err = count(cfg.QueryType.MX)
 	if err != nil {
 		return err
 	}
-	ql.QueryType.TXTCount, err = count(ql.QueryType.TXT)
+	cfg.QueryType.TXTCount, err = count(cfg.QueryType.TXT)
 	if err != nil {
 		return err
 	}
@@ -75,25 +75,25 @@ func count(s []string) (uint16, error) {
 }
 
 // loadConfig will load the configuration from file.
-func LoadConfigFromFile(cfgfile *string) (*QueryList, error) {
+func LoadConfigFromFile(cfgfile *string) (*Configuration, error) {
 	// cfg is a slice of strings unmarsalled from YAML
-	cfg := new(QueryList)
+	cfg := new(Configuration)
 
 	// Open passed in filename
 	f, err := os.Open(*cfgfile)
 	if err != nil {
-		return &QueryList{}, err
+		return &Configuration{}, err
 	}
 	defer f.Close()
 
 	// Load from reader, validate
 	err = cfg.LoadConfig(f)
 	if err != nil {
-		return &QueryList{}, err
+		return &Configuration{}, err
 	}
 	err = cfg.PopulateCounts()
 	if err != nil {
-		return &QueryList{}, err
+		return &Configuration{}, err
 	}
 
 	return cfg, nil
