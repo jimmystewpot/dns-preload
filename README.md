@@ -1,6 +1,11 @@
 # dns-preload
 A simple go based dns cache preloader.
 
+## Why?
+
+With an intermittent satellite connection when the connection is lost the local DNS cache is flushed. When the connection is restablished the high latency on the link causes a slow down for all connections being reestablished. This was an easy way to update the cache asynchronously when the connection is restored which improves usability of the whole system.
+
+It also works well on trains with crappy reception.
 ## Usage
 
 Add an @reboot line to your users crontab so when the host reboots it will run the tool to pre-populate the dns server
@@ -19,13 +24,22 @@ An example configuration file can be found at `example-config.yaml` in the root 
 
 ### Building
 
-```make build```
+#### Local System
 
-## Why?
+```make dns-preload```
 
-With an intermittent satellite connection when the connection is lost the local DNS cache is flushed. When the connection is restablished the high latency on the link causes a slow down for all connections being reestablished. This was an easy way to update the cache asynchronously when the connection is restored which improves usability of the whole system.
+#### Linux ARM64
 
-It also works well on trains with crappy reception.
+```make linux-arm64```
+
+#### Linux ARM32
+
+```make linux-arm32```
+
+#### Linux x86-64
+
+```make linux-x64```
+
 
 
 ## Help

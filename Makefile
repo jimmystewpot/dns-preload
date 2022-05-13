@@ -42,7 +42,9 @@ build: get-golang
 		-t ${DOCKER_IMAGE} \
 		make build-all
 
-build-all: deps test lint pdns-statsd-proxy
+build-all: deps test lint dns-preload
+
+
 
 deps:
 	GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.1
@@ -51,6 +53,24 @@ dns-preload:
 	@echo ""
 	@echo "***** Building $$TOOL *****"
 	go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
+	@echo ""
+
+linux-arm64:
+	@echo ""
+	@echo "***** Building $$TOOL for Linux ARM64 *****"
+	GOOS=linux GOARCH=arm64 go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
+	@echo ""
+
+linux-x64:
+	@echo ""
+	@echo "***** Building $$TOOL for Linux x86-64 *****"
+	GOOS=linux GOARCH=amd64 go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
+	@echo ""
+
+linux-arm32:
+	@echo ""
+	@echo "***** Building $$TOOL for Linux ARM32 *****"
+	GOOS=linux GOARCH=arm go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
 test:

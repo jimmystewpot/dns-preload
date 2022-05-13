@@ -38,8 +38,8 @@ var (
 type Preload struct {
 	ConfigFile string        `required:"" help:"The configuration file to read the domain list to query from"`
 	Server     string        `default:"localhost" help:"The server to query to seed the domain list into"`
-	Port       string        `default:"53" help:"The port to query for on the DNS server"`
-	Workers    uint8         `default:"5" help:"The number of concurrent goroutines used to query the DNS server"`
+	Port       string        `default:"53" help:"The port the DNS server listens for requests on"`
+	Workers    uint8         `default:"1" help:"The number of concurrent goroutines used to query the DNS server (not implemented yet)"`
 	Quiet      bool          `default:"false" help:"Suppress the preload response output to console"`
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
@@ -49,6 +49,7 @@ type Preload struct {
 }
 
 func (p *Preload) Run(cmd string) error {
+	time.Sleep(p.Delay)
 	cfg, err := confighandlers.LoadConfigFromFile(&p.ConfigFile)
 	if err != nil {
 		return err
