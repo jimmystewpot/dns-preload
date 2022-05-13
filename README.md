@@ -1,7 +1,7 @@
 # dns-preload
 A simple go based dns cache preloader.
 
-## usage
+## Usage
 
 Add an @reboot line to your users crontab so when the host reboots it will run the tool to pre-populate the dns server
 with the entries that you wish to use.
@@ -13,9 +13,13 @@ Can be added to crontab as a user `crontab -e`
 `@reboot $HOME/dns-preload all --config-file=dns-preload.yaml --full --quiet --server=::1`
 
 replace $HOME with where you have placed the executable.
-### cCnfiguration
+### Configuration
 
 An example configuration file can be found at `example-config.yaml` in the root of the repository.
+
+### Building
+
+```make build```
 
 ## Why?
 
