@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -46,7 +45,6 @@ type Preload struct {
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
 	Delay      time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
 	resolver   *net.Resolver
-	wg         *sync.WaitGroup
 }
 
 func (p *Preload) Run(qtype string) error {
@@ -105,8 +103,8 @@ func (p *Preload) Run(qtype string) error {
 			return nil
 		}
 		return p.TXT(ctx, cfg.QueryType.TXT)
-	default:
-		return fmt.Errorf("%s incorrect command", qtype)
+		//default:
+		//	return fmt.Errorf("%s incorrect command", qtype)
 	}
 	return nil
 }
@@ -128,12 +126,12 @@ func Starter(srv string, qtype string, hosts ...[]string) bool {
 // Hosts preload the nameserver with IP addresses for a given list of hostnames.
 func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 	for i := 0; i < len(hosts); i++ {
-		start := time.Now()
+		s := time.Now()
 		result, err := p.resolver.LookupIPAddr(ctx, hosts[i])
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], aType, time.Now().Sub(start), result)
+		err = p.Printer(hosts[i], aType, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -144,12 +142,12 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 // CNAME preload the nameserver with CNAME lookups for a given list of hostnames.
 func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 	for i := 0; i < len(hosts); i++ {
-		start := time.Now()
+		s := time.Now()
 		result, err := p.resolver.LookupCNAME(ctx, hosts[i])
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], cnameType, time.Now().Sub(start), result)
+		err = p.Printer(hosts[i], cnameType, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -160,12 +158,12 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 // NS preloads the nameserver records for a given list of hostnames.
 func (p *Preload) NS(ctx context.Context, hosts []string) error {
 	for i := 0; i < len(hosts); i++ {
-		start := time.Now()
+		s := time.Now()
 		result, err := p.resolver.LookupNS(ctx, hosts[i])
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], nsType, time.Now().Sub(start), result)
+		err = p.Printer(hosts[i], nsType, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -176,13 +174,13 @@ func (p *Preload) NS(ctx context.Context, hosts []string) error {
 // MX preloads the nameserver with the MX records for a given list of hostnames.
 func (p *Preload) MX(ctx context.Context, hosts []string) error {
 	for i := 0; i < len(hosts); i++ {
-		start := time.Now()
+		s := time.Now()
 		result, err := p.resolver.LookupMX(ctx, hosts[i])
 		if err != nil {
 			return err
 		}
 
-		err = p.Printer(hosts[i], mxType, time.Now().Sub(start), result)
+		err = p.Printer(hosts[i], mxType, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -193,12 +191,12 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 // TXT preloads the nameserver with the TXT records for a given list of hostnames.
 func (p *Preload) TXT(ctx context.Context, hosts []string) error {
 	for i := 0; i < len(hosts); i++ {
-		start := time.Now()
+		s := time.Now()
 		result, err := p.resolver.LookupTXT(ctx, hosts[i])
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], txtType, time.Now().Sub(start), result)
+		err = p.Printer(hosts[i], txtType, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -219,14 +217,20 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 		for _, mx := range results.([]*net.MX) {
 			str = append(str, mx.Host)
 			if p.Full {
-				p.Hosts(context.Background(), str)
+				err := p.Hosts(context.Background(), str)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	case []*net.NS:
 		for _, ns := range results.([]*net.NS) {
 			str = append(str, ns.Host)
 			if p.Full {
-				p.Hosts(context.Background(), str)
+				err := p.Hosts(context.Background(), str)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	case []net.IPAddr:
@@ -234,7 +238,7 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 			str = append(str, ip.IP.String())
 		}
 	default:
-		return fmt.Errorf("ERROR: got type %+v\n", r.(string))
+		return fmt.Errorf("error: got type %+v", r.(string))
 	}
 	if !p.Quiet {
 		fmt.Printf("Preloaded %s type %s in %s to %+s\n", hostname, qtype, duration, strings.Join(str, ", "))
@@ -256,5 +260,5 @@ func main() {
 		fmt.Println(err)
 	}
 	cmd.FatalIfErrorf(err)
-	fmt.Printf("Preload completed in %s\n", time.Now().Sub(start))
+	fmt.Printf("Preload completed in %s\n", time.Since(start))
 }
