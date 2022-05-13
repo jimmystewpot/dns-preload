@@ -14,12 +14,13 @@ import (
 
 const (
 	// these const strings are used to store the DNS query types for reuse.
-	aTypeStr       string = "A, AAAA"
-	cnameTypeStr   string = "CNAME"
-	mxTypeStr      string = "MX"
-	nsTypeStr      string = "NS"
-	txtTypeStr     string = "TXT"
-	preloadMessage string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
+	aTypeStr          string = "A, AAAA"
+	cnameTypeStr      string = "CNAME"
+	mxTypeStr         string = "MX"
+	nsTypeStr         string = "NS"
+	txtTypeStr        string = "TXT"
+	preloadMessage    string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
+	preloadErrMessage string = "Preloading error: query type %s has no entries in the configuration\n"
 )
 
 var (
@@ -42,6 +43,7 @@ type Preload struct {
 	Workers    uint8         `default:"1" help:"The number of concurrent goroutines used to query the DNS server (not implemented yet)"`
 	Quiet      bool          `default:"false" help:"Suppress the preload response output to console"`
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
+	Debug      bool          `default:"false" help:"Debug mode"`
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
 	Delay      time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
 	resolver   *net.Resolver
@@ -93,8 +95,9 @@ func (p *Preload) Run(cmd string) error {
 			fmt.Printf(preloadMessage, p.nameserver, txtTypeStr, strings.Join(cfg.QueryType.TXT, ", "))
 			return p.TXT(ctx, cfg.QueryType.TXT)
 		}
-	default:
-		return fmt.Errorf("%s unknown command", cmd)
+	}
+	if p.Debug {
+		fmt.Printf(preloadErrMessage, cmd)
 	}
 	return nil
 }
