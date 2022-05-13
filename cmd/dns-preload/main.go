@@ -208,7 +208,7 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 		return fmt.Errorf("error: got type %+v", r.(string))
 	}
 	if p.Full {
-		if (qtype == confighandlers.Mx) || (qtype == confighandlers.Ns) {
+		if (qtype == mxTypeStr) || (qtype == nsTypeStr) {
 			err := p.Hosts(context.Background(), str)
 			if err != nil {
 				return err
