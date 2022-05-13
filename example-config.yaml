@@ -1,0 +1,33 @@
+---
+query_type:
+  hosts:
+    - google.com
+    - microsoft.com
+    - apple.com
+    - amazon.com
+    - aws.amazon.com
+    - cloud.google.com
+    - azure.com
+    - facebook.com
+    - twitter.com
+    - reddit.com
+    - tumblr.com
+    - yahoo.com
+    - bbc.com
+    - ring.com
+    - netflix.com
+    - github.com
+    - bitbucket.org
+  ns:
+  - github.com
+  mx:
+  - gmail.com
+  - hotmail.com
+  - yahoo.com
+  - yahoo.co.uk
+  txt:
+  - salesforce.com
+  - linkedin.com
+  cname:
+  - www.salesforce.com
+
