@@ -3,7 +3,7 @@ SHELL  := /bin/bash
 
 
 TOOL := dns-preload
-export PATH = /usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/build/bin
+export PATH = /usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/build/bin:/home/runner/go:/home/runner/go/bin:
 BINPATH := bin
 GO_DIR := src/github.com/jimmystewpot/dns-preload/
 DOCKER_IMAGE := golang:1.18-bullseye
@@ -28,7 +28,7 @@ lint:
 ifdef INTERACTIVE
 	golangci-lint run -v $(TEST_DIRS)
 else
-	$$GOPATH/bin/golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
+	golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
 endif
 .PHONY: lint
 
