@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net"
 	"testing"
 	"time"
 
@@ -388,7 +389,7 @@ func TestPreloadCNAME(t *testing.T) {
 	}
 }
 
-func TestPreloadRunQuery(t *testing.T) {
+func TestPreloadRunQueries(t *testing.T) {
 	type fields struct {
 		ConfigFile string
 		Server     string
@@ -452,7 +453,6 @@ func TestPreloadRunQuery(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
-				Debug:      true,
 			},
 			args: args{
 				cmd: "mx",
@@ -471,6 +471,19 @@ func TestPreloadRunQuery(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "good config test - wrong cmd",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+				Debug:      true,
+			},
+			args: args{
+				cmd: "foo",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -485,7 +498,7 @@ func TestPreloadRunQuery(t *testing.T) {
 				Timeout:    tt.fields.Timeout,
 				Delay:      tt.fields.Delay,
 				resolver:   dns.NewMockResolver(),
-				nameserver: tt.fields.nameserver,
+				nameserver: net.JoinHostPort(tt.fields.Server, tt.fields.Port),
 			}
 			cfg, _ := confighandlers.LoadConfigFromFile(&tt.fields.ConfigFile)
 			if err := p.RunQueries(context.Background(), tt.args.cmd, cfg); (err != nil) != tt.wantErr {
