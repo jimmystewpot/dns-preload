@@ -8,8 +8,11 @@ import (
 )
 
 const (
-	googlePubDns1 string = "8.8.4.4"
-	googlePubDns2 string = "8.8.8.8"
+	googlePubDns1     string = "8.8.4.4"
+	googlePubDns2     string = "8.8.8.8"
+	testDomainNoErr   string = "foo.bar"
+	testDomainWithErr string = "bar.foo"
+	nxDomainErr       string = "nxdomain %s"
 )
 
 type Resolver interface {
@@ -77,14 +80,14 @@ func (m *mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 	case "www.foo.bar":
 		return "foo.bar", nil
 	case "www.bar.foo":
-		return "", fmt.Errorf("no cname found")
+		return "", fmt.Errorf(nxDomainErr, host)
 	}
 	return "", nil
 }
 
 func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
 	switch host {
-	case "foo.bar":
+	case testDomainNoErr:
 		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
 			{
@@ -99,7 +102,7 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 			},
 		}, nil
 	case "mx1.foo.bar":
-		return []net.IPAddr{}, fmt.Errorf("error")
+		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
 	case "ns1.foo.bar":
 		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
@@ -108,14 +111,14 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 			},
 		}, nil
 	case "ns2.foo.bar":
-		ip2 := net.ParseIP("8.8.8.8")
+		ip2 := net.ParseIP(googlePubDns2)
 		return []net.IPAddr{
 			{
 				IP: ip2,
 			},
 		}, nil
-	case "bar.foo":
-		return []net.IPAddr{}, fmt.Errorf("error")
+	case testDomainWithErr:
+		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
 
 	}
 	return []net.IPAddr{}, nil
@@ -123,7 +126,7 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 
 func (m *mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, error) {
 	switch host {
-	case "foo.bar":
+	case testDomainNoErr:
 		return []*net.MX{
 			{
 				Host: "mx0.foo.bar",
@@ -134,8 +137,8 @@ func (m *mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, er
 				Pref: uint16(10),
 			},
 		}, nil
-	case "bar.foo":
-		return []*net.MX{}, fmt.Errorf("error")
+	case testDomainWithErr:
+		return []*net.MX{}, fmt.Errorf(nxDomainErr, host)
 
 	}
 	return []*net.MX{}, nil
@@ -143,19 +146,19 @@ func (m *mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, er
 
 func (m *mockresolver) LookupTXT(ctx context.Context, host string) ([]string, error) {
 	switch host {
-	case "foo.bar":
+	case testDomainNoErr:
 		return []string{
 			"v=spf1 -all",
 		}, nil
-	case "bar.foo":
-		return []string{}, fmt.Errorf("error")
+	case testDomainWithErr:
+		return []string{}, fmt.Errorf(nxDomainErr, host)
 	}
 	return []string{}, nil
 }
 
 func (m *mockresolver) LookupNS(ctx context.Context, host string) ([]*net.NS, error) {
 	switch host {
-	case "foo.bar":
+	case testDomainNoErr:
 		return []*net.NS{
 			{
 				Host: "ns1.foo.bar",
@@ -164,8 +167,8 @@ func (m *mockresolver) LookupNS(ctx context.Context, host string) ([]*net.NS, er
 				Host: "ns2.foo.bar",
 			},
 		}, nil
-	case "bar.foo":
-		return []*net.NS{}, fmt.Errorf("error")
+	case testDomainWithErr:
+		return []*net.NS{}, fmt.Errorf(nxDomainErr, host)
 	}
 	return []*net.NS{}, nil
 }
