@@ -11,6 +11,8 @@ import (
 const (
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
+	testDNSServer     string = "9.9.9.9"
+	testDNSServerPort string = "53"
 )
 
 func TestPreloadHosts(t *testing.T) {
@@ -415,14 +417,63 @@ func TestPreloadRun(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "good config test",
+			name: "good config test - cname",
 			fields: fields{
 				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
-				Server:     "192.168.1.252",
-				Port:       "53",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
 			},
 			args: args{
 				cmd: "cname",
+			},
+			wantErr: false,
+		},
+		{
+			name: "good config test - hosts",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+			},
+			args: args{
+				cmd: "hosts",
+			},
+			wantErr: false,
+		},
+		{
+			name: "good config test - txt",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+			},
+			args: args{
+				cmd: "txt",
+			},
+			wantErr: false,
+		},
+		{
+			name: "good config test - mx",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+				Debug:      true,
+			},
+			args: args{
+				cmd: "mx",
+			},
+			wantErr: false,
+		},
+		{
+			name: "good config test - ns",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+			},
+			args: args{
+				cmd: "ns",
 			},
 			wantErr: false,
 		},
