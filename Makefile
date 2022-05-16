@@ -17,6 +17,9 @@ get-golang:
 get-synk:
 	docker pull ${SYNK_IMAGE}
 
+get-sonarcloud:
+	docker pull sonarsource/sonar-scanner-cli
+
 .PHONY: clean
 clean:
 	@echo $(shell docker images -qa -f 'dangling=true'|egrep '[a-z0-9]+' && docker rmi $(shell docker images -qa -f 'dangling=true'))
@@ -73,7 +76,7 @@ linux-arm32:
 	GOOS=linux GOARCH=arm go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
-test:
+test: lint
 	@echo ""
 	@echo "***** Testing ${TOOL} *****"
 	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json ./cmd/$(TOOL) 1> reports/testreport.json
@@ -90,3 +93,15 @@ test-synk: get-synk
 		-e SNYK_TOKEN=${SYNK_TOKEN} \
 		-e MONITOR=true \
 		-t ${SYNK_IMAGE}
+
+test-sonarcloud: get-sonarcloud
+	@echo ""
+	@echo "***** Doing code analysis using SonarCloud *****"
+	@docker run \
+		--rm \
+		-v $(CURDIR):/build/$(GO_DIR) \
+		--workdir /build/$(GO_DIR) \
+		-e SNYK_TOKEN=${SYNK_TOKEN} \
+		-e MONITOR=true \
+		-t ${SYNK_IMAGE} \
+		sonarsource/sonar-scanner-cli
