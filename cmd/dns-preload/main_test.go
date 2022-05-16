@@ -45,7 +45,8 @@ func TestPreloadHosts(t *testing.T) {
 		{
 			name: "Test Case Without Error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -56,7 +57,8 @@ func TestPreloadHosts(t *testing.T) {
 		{
 			name: "Test Case With Error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -115,9 +117,10 @@ func TestPreloadMX(t *testing.T) {
 		{
 			name: "IN MX",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
-				Full:     false,
-				Quiet:    false,
+				resolver:   dns.NewMockResolver(),
+				Full:       false,
+				Quiet:      false,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -128,9 +131,10 @@ func TestPreloadMX(t *testing.T) {
 		{
 			name: "IN MX full recursion with error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
-				Full:     true,
-				Quiet:    false,
+				resolver:   dns.NewMockResolver(),
+				Full:       true,
+				Quiet:      false,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx: ctx,
@@ -142,7 +146,8 @@ func TestPreloadMX(t *testing.T) {
 		{
 			name: "IN MX with Error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -201,9 +206,10 @@ func TestPreloadTXT(t *testing.T) {
 		{
 			name: "IN TXT",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
-				Full:     true,
-				Quiet:    false,
+				resolver:   dns.NewMockResolver(),
+				Full:       true,
+				Quiet:      false,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -214,7 +220,8 @@ func TestPreloadTXT(t *testing.T) {
 		{
 			name: "IN TXT error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -236,7 +243,7 @@ func TestPreloadTXT(t *testing.T) {
 				Timeout:    tt.fields.Timeout,
 				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
-				nameserver: tt.fields.nameserver,
+				nameserver: net.JoinHostPort(tt.fields.Server, tt.fields.Port),
 			}
 			if err := p.TXT(tt.args.ctx, tt.args.hosts); (err != nil) != tt.wantErr {
 				t.Errorf("Preload.TXT() error = %v, wantErr %v", err, tt.wantErr)
@@ -273,9 +280,10 @@ func TestPreloadNS(t *testing.T) {
 		{
 			name: "IN NS",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
-				Full:     true,
-				Quiet:    false,
+				resolver:   dns.NewMockResolver(),
+				Full:       true,
+				Quiet:      false,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -286,7 +294,8 @@ func TestPreloadNS(t *testing.T) {
 		{
 			name: "IN NS error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -308,7 +317,7 @@ func TestPreloadNS(t *testing.T) {
 				Timeout:    tt.fields.Timeout,
 				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
-				nameserver: tt.fields.nameserver,
+				nameserver: net.JoinHostPort(tt.fields.Server, tt.fields.Port),
 			}
 			if err := p.NS(tt.args.ctx, tt.args.hosts); (err != nil) != tt.wantErr {
 				t.Errorf("Preload.NS() error = %v, wantErr %v", err, tt.wantErr)
@@ -345,9 +354,10 @@ func TestPreloadCNAME(t *testing.T) {
 		{
 			name: "IN CNAME",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
-				Full:     true,
-				Quiet:    false,
+				resolver:   dns.NewMockResolver(),
+				Full:       true,
+				Quiet:      false,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -358,7 +368,8 @@ func TestPreloadCNAME(t *testing.T) {
 		{
 			name: "IN CNAME error",
 			fields: fields{
-				resolver: dns.NewMockResolver(),
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				ctx:   ctx,
@@ -417,6 +428,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				cmd: "cname",
@@ -429,6 +441,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				cmd: "hosts",
@@ -441,6 +454,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				cmd: "txt",
@@ -453,6 +467,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				cmd: "mx",
@@ -465,6 +480,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
 				cmd: "ns",
@@ -477,6 +493,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Debug:      true,
 			},
 			args: args{
@@ -498,7 +515,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Timeout:    tt.fields.Timeout,
 				Delay:      tt.fields.Delay,
 				resolver:   dns.NewMockResolver(),
-				nameserver: net.JoinHostPort(tt.fields.Server, tt.fields.Port),
+				nameserver: tt.fields.nameserver,
 			}
 			cfg, _ := confighandlers.LoadConfigFromFile(&tt.fields.ConfigFile)
 			if err := p.RunQueries(context.Background(), tt.args.cmd, cfg); (err != nil) != tt.wantErr {
