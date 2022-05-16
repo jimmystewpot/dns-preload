@@ -47,10 +47,10 @@ build: get-golang
 
 build-all: deps test lint dns-preload
 
-
+test-all: deps lint test
 
 deps:
-	GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.1
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.1
 
 dns-preload:
 	@echo ""
@@ -76,7 +76,7 @@ linux-arm32:
 	GOOS=linux GOARCH=arm go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
-test: deps lint
+test:
 	@echo ""
 	@echo "***** Testing ${TOOL} *****"
 	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json ./cmd/$(TOOL) 1> reports/testreport.json
