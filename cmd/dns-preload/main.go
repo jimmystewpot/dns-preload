@@ -10,6 +10,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/jimmystewpot/dns-preload/pkg/confighandlers"
+	"github.com/jimmystewpot/dns-preload/pkg/dns"
 )
 
 const (
@@ -46,7 +47,7 @@ type Preload struct {
 	Debug      bool          `default:"false" help:"Debug mode"`
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
 	Delay      time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
-	resolver   *net.Resolver
+	resolver   dns.Resolver
 	nameserver string
 }
 
@@ -58,16 +59,8 @@ func (p *Preload) Run(cmd string) error {
 	}
 
 	p.nameserver = net.JoinHostPort(p.Server, p.Port)
-	p.resolver = &net.Resolver{
-		PreferGo:     true,
-		StrictErrors: true,
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			d := net.Dialer{
-				Timeout: p.Timeout,
-			}
-			return d.DialContext(ctx, network, p.nameserver)
-		},
-	}
+	p.resolver = dns.NewResolver(p.nameserver, p.Timeout)
+
 	ctx := context.Background()
 	switch cmd {
 	case confighandlers.Cname:
@@ -208,6 +201,7 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 		return fmt.Errorf("error: got type %+v", r.(string))
 	}
 	if p.Full {
+		// mx and ns record types return hostnames, if full is on we should resolve the final targets.
 		if (qtype == mxTypeStr) || (qtype == nsTypeStr) {
 			err := p.Hosts(context.Background(), str)
 			if err != nil {

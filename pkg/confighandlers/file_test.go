@@ -1,7 +1,6 @@
 package confighandlers
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -195,6 +194,5 @@ func TestQueryListPopulateCounts(t *testing.T) {
 
 func garbage(s int64) []string {
 	x := make([]string, s)
-	fmt.Println(len(x))
 	return x
 }
