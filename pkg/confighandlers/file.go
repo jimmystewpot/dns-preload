@@ -53,9 +53,11 @@ func (cfg *Configuration) LoadConfig(r io.Reader) error {
 	return nil
 }
 
+// PopulateCounts for how many domains are in each query_type.
 func (cfg *Configuration) PopulateCounts() error {
 	var err error
 	cfg.QueryType.CnameCount, err = count(cfg.QueryType.Cname)
+	fmt.Println(cfg.QueryType.CnameCount)
 	if err != nil {
 		return err
 	}
@@ -78,6 +80,7 @@ func (cfg *Configuration) PopulateCounts() error {
 	return nil
 }
 
+// count wrapper for uint16
 func count(s []string) (uint16, error) {
 	return Uint16(s)
 }

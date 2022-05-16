@@ -40,9 +40,25 @@ func TestLoadConfigFromFile(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "missing test configuration file",
+			args: args{
+				cfgfile: ptr("test_data/missing_file_example.yaml"),
+			},
+			want:    &QueryType{},
+			wantErr: true,
+		},
+		{
 			name: "bad test configuration file",
 			args: args{
-				cfgfile: ptr("test_data/bad_config_sample.yaml"),
+				cfgfile: ptr("test_data/bad_configuration_sample.yaml"),
+			},
+			want:    &QueryType{},
+			wantErr: true,
+		},
+		{
+			name: "too large configuration file",
+			args: args{
+				cfgfile: ptr("test_data/overrun_configuration_example.yaml"),
 			},
 			want:    &QueryType{},
 			wantErr: true,
@@ -63,10 +79,6 @@ func TestLoadConfigFromFile(t *testing.T) {
 			}
 		})
 	}
-}
-
-func ptr(s string) *string {
-	return &s
 }
 
 func TestQueryListPopulateCounts(t *testing.T) {
@@ -192,7 +204,52 @@ func TestQueryListPopulateCounts(t *testing.T) {
 	}
 }
 
+func TestCount(t *testing.T) {
+	type args struct {
+		s []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    uint16
+		wantErr bool
+	}{
+		{
+			name: "happy path",
+			args: args{
+				s: garbage(2),
+			},
+			want:    2,
+			wantErr: false,
+		},
+		{
+			name: "error path",
+			args: args{
+				s: garbage(100000),
+			},
+			want:    0,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := count(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("count() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("count() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func garbage(s int64) []string {
 	x := make([]string, s)
 	return x
+}
+
+func ptr(s string) *string {
+	return &s
 }
