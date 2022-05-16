@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+const (
+	googlePubDns1 string = "8.8.4.4"
+	googlePubDns2 string = "8.8.8.8"
+)
+
 type Resolver interface {
 	LookupCNAME(ctx context.Context, host string) (string, error)
 	LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error)
@@ -80,14 +85,14 @@ func (m *mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
 	switch host {
 	case "foo.bar":
-		ip1 := net.ParseIP("8.8.4.4")
+		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
 			{
 				IP: ip1,
 			},
 		}, nil
 	case "mx0.foo.bar":
-		ip1 := net.ParseIP("8.8.4.4")
+		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
 			{
 				IP: ip1,
@@ -96,7 +101,7 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 	case "mx1.foo.bar":
 		return []net.IPAddr{}, fmt.Errorf("error")
 	case "ns1.foo.bar":
-		ip1 := net.ParseIP("8.8.4.4")
+		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
 			{
 				IP: ip1,
