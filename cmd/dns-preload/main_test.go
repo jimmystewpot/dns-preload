@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jimmystewpot/dns-preload/pkg/confighandlers"
 	"github.com/jimmystewpot/dns-preload/pkg/dns"
 )
 
@@ -387,7 +388,7 @@ func TestPreloadCNAME(t *testing.T) {
 	}
 }
 
-func TestPreloadRun(t *testing.T) {
+func TestPreloadRunQuery(t *testing.T) {
 	type fields struct {
 		ConfigFile string
 		Server     string
@@ -411,15 +412,9 @@ func TestPreloadRun(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "err test",
-			fields:  fields{},
-			args:    args{},
-			wantErr: true,
-		},
-		{
 			name: "good config test - cname",
 			fields: fields{
-				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 			},
@@ -431,7 +426,7 @@ func TestPreloadRun(t *testing.T) {
 		{
 			name: "good config test - hosts",
 			fields: fields{
-				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 			},
@@ -443,7 +438,7 @@ func TestPreloadRun(t *testing.T) {
 		{
 			name: "good config test - txt",
 			fields: fields{
-				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 			},
@@ -455,7 +450,7 @@ func TestPreloadRun(t *testing.T) {
 		{
 			name: "good config test - mx",
 			fields: fields{
-				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 				Debug:      true,
@@ -468,7 +463,7 @@ func TestPreloadRun(t *testing.T) {
 		{
 			name: "good config test - ns",
 			fields: fields{
-				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 			},
@@ -490,11 +485,12 @@ func TestPreloadRun(t *testing.T) {
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
 				Delay:      tt.fields.Delay,
-				resolver:   tt.fields.resolver,
+				resolver:   dns.NewMockResolver(),
 				nameserver: tt.fields.nameserver,
 			}
-			if err := p.Run(tt.args.cmd); (err != nil) != tt.wantErr {
-				t.Errorf("Preload.Run() error = %v, wantErr %v", err, tt.wantErr)
+			cfg, _ := confighandlers.LoadConfigFromFile(&tt.fields.ConfigFile)
+			if err := p.RunQueries(context.Background(), tt.args.cmd, cfg); (err != nil) != tt.wantErr {
+				t.Errorf("Preload.RunQueries() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

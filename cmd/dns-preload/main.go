@@ -62,6 +62,10 @@ func (p *Preload) Run(cmd string) error {
 	p.resolver = dns.NewResolver(p.nameserver, p.Timeout)
 
 	ctx := context.Background()
+	return p.RunQueries(ctx, cmd, cfg)
+}
+
+func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandlers.Configuration) error {
 	switch cmd {
 	case confighandlers.Cname:
 		if cfg.QueryType.CnameCount != 0 {

@@ -1,0 +1,14 @@
+---
+query_type:
+  hosts:
+  - foo.bar
+  ns:
+  - foo.bar
+  mx:
+  - foo.bar
+  txt:
+  - foo.bar
+  cname:
+  - www.foo.bar
+
+
