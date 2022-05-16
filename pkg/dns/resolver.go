@@ -12,6 +12,8 @@ const (
 	googlePubDns2     string = "8.8.8.8"
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
+	testDomainMX0     string = "mx0.foo.bar"
+	testDomainMX1     string = "mx1.foo.bar"
 	nxDomainErr       string = "nxdomain %s"
 )
 
@@ -78,7 +80,7 @@ type mockresolver struct{}
 func (m *mockresolver) LookupCNAME(ctx context.Context, host string) (string, error) {
 	switch host {
 	case "www.foo.bar":
-		return "foo.bar", nil
+		return testDomainNoErr, nil
 	case "www.bar.foo":
 		return "", fmt.Errorf(nxDomainErr, host)
 	}
@@ -87,22 +89,13 @@ func (m *mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 
 func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
 	switch host {
-	case testDomainNoErr:
+	case testDomainNoErr, testDomainMX0:
 		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
 			{
 				IP: ip1,
 			},
 		}, nil
-	case "mx0.foo.bar":
-		ip1 := net.ParseIP(googlePubDns1)
-		return []net.IPAddr{
-			{
-				IP: ip1,
-			},
-		}, nil
-	case "mx1.foo.bar":
-		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
 	case "ns1.foo.bar":
 		ip1 := net.ParseIP(googlePubDns1)
 		return []net.IPAddr{
@@ -119,7 +112,8 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 		}, nil
 	case testDomainWithErr:
 		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
-
+	case testDomainMX1:
+		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
 	}
 	return []net.IPAddr{}, nil
 }
@@ -129,11 +123,11 @@ func (m *mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, er
 	case testDomainNoErr:
 		return []*net.MX{
 			{
-				Host: "mx0.foo.bar",
+				Host: testDomainMX0,
 				Pref: uint16(10),
 			},
 			{
-				Host: "mx1.foo.bar",
+				Host: testDomainMX1,
 				Pref: uint16(10),
 			},
 		}, nil
