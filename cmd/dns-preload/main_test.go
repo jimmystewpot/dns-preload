@@ -399,7 +399,6 @@ func TestPreloadRunQuery(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
 		nameserver string
 	}
 	type args struct {
