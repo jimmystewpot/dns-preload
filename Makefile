@@ -79,7 +79,7 @@ linux-arm32:
 test:
 	@echo ""
 	@echo "***** Testing ${TOOL} *****"
-	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json ./cmd/$(TOOL) 1> reports/testreport.json
+	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json ./... 1> reports/testreport.json
 	@echo ""
 
 
