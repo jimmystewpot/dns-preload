@@ -47,7 +47,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Test Dependencies
-        run: make dep
+        run: make deps
       - name: Install golang-ci-lint
         run: make lint
       - name: Run Tests
