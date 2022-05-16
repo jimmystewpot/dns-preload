@@ -50,7 +50,7 @@ build-all: deps test lint dns-preload
 test-all: deps lint test
 
 deps:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.1
+	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.1
 
 dns-preload:
 	@echo ""
