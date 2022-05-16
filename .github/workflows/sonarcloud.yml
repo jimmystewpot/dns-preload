@@ -73,7 +73,6 @@ jobs:
             -Dsonar.go.coverage.reportPaths=reports/coverage.txt
             -Dsonar.go.golint.reportPaths=/github/workspace/reports/checkstyle-lint.xml
             -Dsonar.test.inclusions=**/*_test.go
-            -Dsonar.exclusions=**/*_test.go
             -Dsonar.scm.disabled
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.verbose=true
