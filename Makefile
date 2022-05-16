@@ -76,7 +76,7 @@ linux-arm32:
 	GOOS=linux GOARCH=arm go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
-test: lint
+test: deps lint
 	@echo ""
 	@echo "***** Testing ${TOOL} *****"
 	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json ./cmd/$(TOOL) 1> reports/testreport.json
