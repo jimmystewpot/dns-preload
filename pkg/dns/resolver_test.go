@@ -297,7 +297,7 @@ func TestMockresolverLookupNS(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &mockresolver{}
+			m := NewMockResolver()
 			got, err := m.LookupNS(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mockresolver.LookupNS() error = %v, wantErr %v", err, tt.wantErr)
@@ -311,6 +311,7 @@ func TestMockresolverLookupNS(t *testing.T) {
 }
 
 func TestNewResolver(t *testing.T) {
+	var testDomain string = "google.com"
 	type args struct {
 		nameserver string
 		timeout    time.Duration
@@ -323,7 +324,7 @@ func TestNewResolver(t *testing.T) {
 		{
 			name: "test",
 			args: args{
-				nameserver: "127.0.0.1:53",
+				nameserver: "192.168.1.252:53",
 				timeout:    time.Duration(5 * time.Second),
 			},
 			want: &resolver{client: &net.Resolver{}},
@@ -331,9 +332,14 @@ func TestNewResolver(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewResolver(tt.args.nameserver, tt.args.timeout); !reflect.DeepEqual(got, got) {
-				t.Errorf("NewResolver() = %v, want %v", got, tt.want)
+			resolver := NewResolver(tt.args.nameserver, tt.args.timeout)
+			if !reflect.DeepEqual(resolver, resolver) {
+				t.Errorf("NewResolver() = %v, want %v", resolver, tt.want)
 			}
+			resolver.LookupIPAddr(context.Background(), testDomain)
+			resolver.LookupMX(context.Background(), testDomain)
+			resolver.LookupTXT(context.Background(), testDomain)
+			resolver.LookupNS(context.Background(), testDomain)
 		})
 	}
 }
