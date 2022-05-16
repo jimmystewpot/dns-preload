@@ -8,6 +8,11 @@ import (
 	"github.com/jimmystewpot/dns-preload/pkg/dns"
 )
 
+const (
+	testDomainNoErr   string = "foo.bar"
+	testDomainWithErr string = "bar.foo"
+)
+
 func TestPreloadHosts(t *testing.T) {
 	ctx := context.Background()
 	type fields struct {
@@ -34,24 +39,24 @@ func TestPreloadHosts(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "IN A and AAAA",
+			name: "Test Case Without Error",
 			fields: fields{
 				resolver: dns.NewMockResolver(),
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"foo.bar"},
+				hosts: []string{testDomainNoErr},
 			},
 			wantErr: false,
 		},
 		{
-			name: "IN A and AAAA with error",
+			name: "Test Case With Error",
 			fields: fields{
 				resolver: dns.NewMockResolver(),
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"bar.foo"},
+				hosts: []string{testDomainWithErr},
 			},
 			wantErr: true,
 		},
@@ -112,7 +117,7 @@ func TestPreloadMX(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"foo.bar"},
+				hosts: []string{testDomainNoErr},
 			},
 			wantErr: false,
 		},
@@ -124,8 +129,9 @@ func TestPreloadMX(t *testing.T) {
 				Quiet:    false,
 			},
 			args: args{
-				ctx:   ctx,
-				hosts: []string{"foo.bar"},
+				ctx: ctx,
+				// full recursive second lookup MX has a failure test case.
+				hosts: []string{testDomainNoErr},
 			},
 			wantErr: true,
 		},
@@ -136,7 +142,7 @@ func TestPreloadMX(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"bar.foo"},
+				hosts: []string{testDomainWithErr},
 			},
 			wantErr: true,
 		},
@@ -197,7 +203,7 @@ func TestPreloadTXT(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"foo.bar"},
+				hosts: []string{testDomainNoErr},
 			},
 			wantErr: false,
 		},
@@ -208,7 +214,7 @@ func TestPreloadTXT(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"bar.foo"},
+				hosts: []string{testDomainWithErr},
 			},
 			wantErr: true,
 		},
@@ -269,7 +275,7 @@ func TestPreloadNS(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"foo.bar"},
+				hosts: []string{testDomainNoErr},
 			},
 			wantErr: false,
 		},
@@ -280,7 +286,7 @@ func TestPreloadNS(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{"bar.foo"},
+				hosts: []string{testDomainWithErr},
 			},
 			wantErr: true,
 		},
