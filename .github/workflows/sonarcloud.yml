@@ -61,9 +61,9 @@ jobs:
             -Dsonar.sources=.
             -Dsonar.projectKey=jimmystewpot_dns-preload
             -Dsonar.organization=jimmystewpot
-            -Dsonar.go.tests.reportPaths=reports/testreport.json
-            -Dsonar.go.coverage.reportPaths=reports/coverage.txt
-            -Dsonar.go.golint.reportPaths=reports/checkstyle-lint.xml
+            -Dsonar.go.tests.reportPaths=/github/workspace/reports/testreport.json
+            -Dsonar.go.coverage.reportPaths=/github/workspace/reports/coverage.txt
+            -Dsonar.go.golint.reportPaths=/github/workspace/reports/checkstyle-lint.xml
             -Dsonar.test.inclusions=**/*_test.go
             -Dsonar.exclusions=**/*_test.go
             -Dsonar.scm.disabled
