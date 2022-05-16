@@ -1,76 +1,76 @@
-{"Time":"2022-05-16T10:51:06.916239+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts"}
-{"Time":"2022-05-16T10:51:06.916583+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts","Output":"=== RUN   TestPreloadHosts\n"}
-{"Time":"2022-05-16T10:51:06.916616+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error"}
-{"Time":"2022-05-16T10:51:06.916626+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Output":"=== RUN   TestPreloadHosts/Test_Case_Without_Error\n"}
-{"Time":"2022-05-16T10:51:06.916637+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Output":"Preloaded foo.bar type A, AAAA in 7.131µs to 8.8.4.4\n"}
-{"Time":"2022-05-16T10:51:06.916646+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error"}
-{"Time":"2022-05-16T10:51:06.916653+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error","Output":"=== RUN   TestPreloadHosts/Test_Case_With_Error\n"}
-{"Time":"2022-05-16T10:51:06.91671+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts","Output":"--- PASS: TestPreloadHosts (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.916725+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Output":"    --- PASS: TestPreloadHosts/Test_Case_Without_Error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.916732+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.916746+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error","Output":"    --- PASS: TestPreloadHosts/Test_Case_With_Error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.916757+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.916764+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.91677+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX"}
-{"Time":"2022-05-16T10:51:06.91678+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX","Output":"=== RUN   TestPreloadMX\n"}
-{"Time":"2022-05-16T10:51:06.916806+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX"}
-{"Time":"2022-05-16T10:51:06.916814+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Output":"=== RUN   TestPreloadMX/IN_MX\n"}
-{"Time":"2022-05-16T10:51:06.916891+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Output":"Preloaded foo.bar type MX in 1.004µs to mx0.foo.bar, mx1.foo.bar\n"}
-{"Time":"2022-05-16T10:51:06.91695+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error"}
-{"Time":"2022-05-16T10:51:06.91698+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Output":"=== RUN   TestPreloadMX/IN_MX_full_recursion_with_error\n"}
-{"Time":"2022-05-16T10:51:06.917038+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Output":"Preloaded mx0.foo.bar type A, AAAA in 2.052µs to 8.8.4.4\n"}
-{"Time":"2022-05-16T10:51:06.917092+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error"}
-{"Time":"2022-05-16T10:51:06.9171+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error","Output":"=== RUN   TestPreloadMX/IN_MX_with_Error\n"}
-{"Time":"2022-05-16T10:51:06.917234+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX","Output":"--- PASS: TestPreloadMX (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917245+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Output":"    --- PASS: TestPreloadMX/IN_MX (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917252+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.917258+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Output":"    --- PASS: TestPreloadMX/IN_MX_full_recursion_with_error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917264+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.91727+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error","Output":"    --- PASS: TestPreloadMX/IN_MX_with_Error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917283+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.917289+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.917295+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT"}
-{"Time":"2022-05-16T10:51:06.917303+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT","Output":"=== RUN   TestPreloadTXT\n"}
-{"Time":"2022-05-16T10:51:06.917335+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT"}
-{"Time":"2022-05-16T10:51:06.917343+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Output":"=== RUN   TestPreloadTXT/IN_TXT\n"}
-{"Time":"2022-05-16T10:51:06.917399+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Output":"Preloaded foo.bar type TXT in 605ns to v=spf1 -all\n"}
-{"Time":"2022-05-16T10:51:06.917452+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error"}
-{"Time":"2022-05-16T10:51:06.91746+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error","Output":"=== RUN   TestPreloadTXT/IN_TXT_error\n"}
-{"Time":"2022-05-16T10:51:06.917586+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT","Output":"--- PASS: TestPreloadTXT (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917597+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Output":"    --- PASS: TestPreloadTXT/IN_TXT (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917604+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.91761+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error","Output":"    --- PASS: TestPreloadTXT/IN_TXT_error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917632+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.917639+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.917645+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS"}
-{"Time":"2022-05-16T10:51:06.917654+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS","Output":"=== RUN   TestPreloadNS\n"}
-{"Time":"2022-05-16T10:51:06.917667+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS"}
-{"Time":"2022-05-16T10:51:06.917676+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"=== RUN   TestPreloadNS/IN_NS\n"}
-{"Time":"2022-05-16T10:51:06.917762+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"Preloaded ns1.foo.bar type A, AAAA in 1.785µs to 8.8.4.4\n"}
-{"Time":"2022-05-16T10:51:06.917773+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"Preloaded ns2.foo.bar type A, AAAA in 1.508µs to 8.8.8.8\n"}
-{"Time":"2022-05-16T10:51:06.917781+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"Preloaded foo.bar type NS in 874ns to ns1.foo.bar, ns2.foo.bar\n"}
-{"Time":"2022-05-16T10:51:06.917842+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error"}
-{"Time":"2022-05-16T10:51:06.917851+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error","Output":"=== RUN   TestPreloadNS/IN_NS_error\n"}
-{"Time":"2022-05-16T10:51:06.917973+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS","Output":"--- PASS: TestPreloadNS (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917984+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"    --- PASS: TestPreloadNS/IN_NS (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.917991+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.917997+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error","Output":"    --- PASS: TestPreloadNS/IN_NS_error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.918004+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.91801+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.918016+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME"}
-{"Time":"2022-05-16T10:51:06.918021+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME","Output":"=== RUN   TestPreloadCNAME\n"}
-{"Time":"2022-05-16T10:51:06.918071+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME"}
-{"Time":"2022-05-16T10:51:06.918081+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Output":"=== RUN   TestPreloadCNAME/IN_CNAME\n"}
-{"Time":"2022-05-16T10:51:06.91814+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Output":"Preloaded www.foo.bar type CNAME in 527ns to foo.bar\n"}
-{"Time":"2022-05-16T10:51:06.91819+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error"}
-{"Time":"2022-05-16T10:51:06.918199+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error","Output":"=== RUN   TestPreloadCNAME/IN_CNAME_error\n"}
-{"Time":"2022-05-16T10:51:06.918338+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME","Output":"--- PASS: TestPreloadCNAME (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.918348+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Output":"    --- PASS: TestPreloadCNAME/IN_CNAME (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.918355+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.918361+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error","Output":"    --- PASS: TestPreloadCNAME/IN_CNAME_error (0.00s)\n"}
-{"Time":"2022-05-16T10:51:06.91838+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.918389+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME","Elapsed":0}
-{"Time":"2022-05-16T10:51:06.918395+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"PASS\n"}
-{"Time":"2022-05-16T10:51:06.919647+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"coverage: 54.6% of statements\n"}
-{"Time":"2022-05-16T10:51:06.937146+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"ok  \tgithub.com/jimmystewpot/dns-preload/cmd/dns-preload\t0.981s\tcoverage: 54.6% of statements\n"}
-{"Time":"2022-05-16T10:51:06.937193+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Elapsed":0.982}
+{"Time":"2022-05-16T11:26:12.423109+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts"}
+{"Time":"2022-05-16T11:26:12.42346+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts","Output":"=== RUN   TestPreloadHosts\n"}
+{"Time":"2022-05-16T11:26:12.423484+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error"}
+{"Time":"2022-05-16T11:26:12.423497+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Output":"=== RUN   TestPreloadHosts/Test_Case_Without_Error\n"}
+{"Time":"2022-05-16T11:26:12.42351+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Output":"Preloaded foo.bar type A, AAAA in 6.418µs to 8.8.4.4\n"}
+{"Time":"2022-05-16T11:26:12.423527+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error"}
+{"Time":"2022-05-16T11:26:12.423537+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error","Output":"=== RUN   TestPreloadHosts/Test_Case_With_Error\n"}
+{"Time":"2022-05-16T11:26:12.42357+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts","Output":"--- PASS: TestPreloadHosts (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.423586+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Output":"    --- PASS: TestPreloadHosts/Test_Case_Without_Error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.423593+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_Without_Error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.423608+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error","Output":"    --- PASS: TestPreloadHosts/Test_Case_With_Error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.423628+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts/Test_Case_With_Error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.423638+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadHosts","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.423645+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX"}
+{"Time":"2022-05-16T11:26:12.423651+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX","Output":"=== RUN   TestPreloadMX\n"}
+{"Time":"2022-05-16T11:26:12.423659+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX"}
+{"Time":"2022-05-16T11:26:12.423664+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Output":"=== RUN   TestPreloadMX/IN_MX\n"}
+{"Time":"2022-05-16T11:26:12.423737+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Output":"Preloaded foo.bar type MX in 1.021µs to mx0.foo.bar, mx1.foo.bar\n"}
+{"Time":"2022-05-16T11:26:12.423794+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error"}
+{"Time":"2022-05-16T11:26:12.423803+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Output":"=== RUN   TestPreloadMX/IN_MX_full_recursion_with_error\n"}
+{"Time":"2022-05-16T11:26:12.423884+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Output":"Preloaded mx0.foo.bar type A, AAAA in 2.027µs to 8.8.4.4\n"}
+{"Time":"2022-05-16T11:26:12.423937+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error"}
+{"Time":"2022-05-16T11:26:12.423963+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error","Output":"=== RUN   TestPreloadMX/IN_MX_with_Error\n"}
+{"Time":"2022-05-16T11:26:12.424085+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX","Output":"--- PASS: TestPreloadMX (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.4241+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Output":"    --- PASS: TestPreloadMX/IN_MX (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424107+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424114+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Output":"    --- PASS: TestPreloadMX/IN_MX_full_recursion_with_error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.42412+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_full_recursion_with_error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424127+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error","Output":"    --- PASS: TestPreloadMX/IN_MX_with_Error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424141+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX/IN_MX_with_Error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424147+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadMX","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424153+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT"}
+{"Time":"2022-05-16T11:26:12.424159+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT","Output":"=== RUN   TestPreloadTXT\n"}
+{"Time":"2022-05-16T11:26:12.424168+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT"}
+{"Time":"2022-05-16T11:26:12.424174+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Output":"=== RUN   TestPreloadTXT/IN_TXT\n"}
+{"Time":"2022-05-16T11:26:12.424239+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Output":"Preloaded foo.bar type TXT in 594ns to v=spf1 -all\n"}
+{"Time":"2022-05-16T11:26:12.424322+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error"}
+{"Time":"2022-05-16T11:26:12.424342+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error","Output":"=== RUN   TestPreloadTXT/IN_TXT_error\n"}
+{"Time":"2022-05-16T11:26:12.424429+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT","Output":"--- PASS: TestPreloadTXT (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424442+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Output":"    --- PASS: TestPreloadTXT/IN_TXT (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424449+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424455+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error","Output":"    --- PASS: TestPreloadTXT/IN_TXT_error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424476+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT/IN_TXT_error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424482+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadTXT","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424488+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS"}
+{"Time":"2022-05-16T11:26:12.424495+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS","Output":"=== RUN   TestPreloadNS\n"}
+{"Time":"2022-05-16T11:26:12.42453+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS"}
+{"Time":"2022-05-16T11:26:12.424539+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"=== RUN   TestPreloadNS/IN_NS\n"}
+{"Time":"2022-05-16T11:26:12.424614+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"Preloaded ns1.foo.bar type A, AAAA in 1.889µs to 8.8.4.4\n"}
+{"Time":"2022-05-16T11:26:12.424633+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"Preloaded ns2.foo.bar type A, AAAA in 1.488µs to 8.8.8.8\n"}
+{"Time":"2022-05-16T11:26:12.424643+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"Preloaded foo.bar type NS in 848ns to ns1.foo.bar, ns2.foo.bar\n"}
+{"Time":"2022-05-16T11:26:12.424701+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error"}
+{"Time":"2022-05-16T11:26:12.424709+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error","Output":"=== RUN   TestPreloadNS/IN_NS_error\n"}
+{"Time":"2022-05-16T11:26:12.424832+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS","Output":"--- PASS: TestPreloadNS (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424842+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Output":"    --- PASS: TestPreloadNS/IN_NS (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424848+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424854+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error","Output":"    --- PASS: TestPreloadNS/IN_NS_error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.424861+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS/IN_NS_error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424867+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadNS","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.424873+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME"}
+{"Time":"2022-05-16T11:26:12.424878+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME","Output":"=== RUN   TestPreloadCNAME\n"}
+{"Time":"2022-05-16T11:26:12.424931+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME"}
+{"Time":"2022-05-16T11:26:12.42494+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Output":"=== RUN   TestPreloadCNAME/IN_CNAME\n"}
+{"Time":"2022-05-16T11:26:12.425001+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Output":"Preloaded www.foo.bar type CNAME in 545ns to foo.bar\n"}
+{"Time":"2022-05-16T11:26:12.425059+10:00","Action":"run","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error"}
+{"Time":"2022-05-16T11:26:12.425079+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error","Output":"=== RUN   TestPreloadCNAME/IN_CNAME_error\n"}
+{"Time":"2022-05-16T11:26:12.425182+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME","Output":"--- PASS: TestPreloadCNAME (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.425192+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Output":"    --- PASS: TestPreloadCNAME/IN_CNAME (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.4252+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.425207+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error","Output":"    --- PASS: TestPreloadCNAME/IN_CNAME_error (0.00s)\n"}
+{"Time":"2022-05-16T11:26:12.425224+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME/IN_CNAME_error","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.425236+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Test":"TestPreloadCNAME","Elapsed":0}
+{"Time":"2022-05-16T11:26:12.425242+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"PASS\n"}
+{"Time":"2022-05-16T11:26:12.426435+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"coverage: 54.6% of statements\n"}
+{"Time":"2022-05-16T11:26:12.445937+10:00","Action":"output","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Output":"ok  \tgithub.com/jimmystewpot/dns-preload/cmd/dns-preload\t0.322s\tcoverage: 54.6% of statements\n"}
+{"Time":"2022-05-16T11:26:12.445992+10:00","Action":"pass","Package":"github.com/jimmystewpot/dns-preload/cmd/dns-preload","Elapsed":0.322}
