@@ -384,3 +384,67 @@ func TestPreloadCNAME(t *testing.T) {
 		})
 	}
 }
+
+func TestPreloadRun(t *testing.T) {
+	type fields struct {
+		ConfigFile string
+		Server     string
+		Port       string
+		Workers    uint8
+		Quiet      bool
+		Full       bool
+		Debug      bool
+		Timeout    time.Duration
+		Delay      time.Duration
+		resolver   dns.Resolver
+		nameserver string
+	}
+	type args struct {
+		cmd string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "err test",
+			fields:  fields{},
+			args:    args{},
+			wantErr: true,
+		},
+		{
+			name: "good config test",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				Server:     "192.168.1.252",
+				Port:       "53",
+			},
+			args: args{
+				cmd: "cname",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &Preload{
+				ConfigFile: tt.fields.ConfigFile,
+				Server:     tt.fields.Server,
+				Port:       tt.fields.Port,
+				Workers:    tt.fields.Workers,
+				Quiet:      tt.fields.Quiet,
+				Full:       tt.fields.Full,
+				Debug:      tt.fields.Debug,
+				Timeout:    tt.fields.Timeout,
+				Delay:      tt.fields.Delay,
+				resolver:   tt.fields.resolver,
+				nameserver: tt.fields.nameserver,
+			}
+			if err := p.Run(tt.args.cmd); (err != nil) != tt.wantErr {
+				t.Errorf("Preload.Run() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
