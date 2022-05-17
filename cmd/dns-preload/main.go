@@ -65,6 +65,7 @@ func (p *Preload) Run(cmd string) error {
 	return p.RunQueries(ctx, cmd, cfg)
 }
 
+// RunQueries breaks out the command switch statement allowing me to write better tests by adding a mock resolver.
 func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandlers.Configuration) error {
 	switch cmd {
 	case confighandlers.Cname:
@@ -202,7 +203,7 @@ func (p *Preload) Printer(hostname string, qtype string, duration time.Duration,
 			str = append(str, ip.IP.String())
 		}
 	default:
-		return fmt.Errorf("error: got type %+v", r.(string))
+		return fmt.Errorf("error: unknown type %T", r)
 	}
 	if p.Full {
 		// mx and ns record types return hostnames, if full is on we should resolve the final targets.

@@ -524,3 +524,68 @@ func TestPreloadRunQueries(t *testing.T) {
 		})
 	}
 }
+
+func TestPreloadPrinter(t *testing.T) {
+	type fields struct {
+		ConfigFile string
+		Server     string
+		Port       string
+		Workers    uint8
+		Quiet      bool
+		Full       bool
+		Debug      bool
+		Timeout    time.Duration
+		Delay      time.Duration
+		resolver   dns.Resolver
+		nameserver string
+	}
+	type args struct {
+		hostname string
+		qtype    string
+		duration time.Duration
+		results  interface{}
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:   "test other interface underlying data type",
+			fields: fields{},
+			args: args{
+				hostname: testDomainNoErr,
+				qtype:    "foo",
+				duration: time.Duration(1 * time.Second),
+				results:  returnIntInterface(),
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &Preload{
+				ConfigFile: tt.fields.ConfigFile,
+				Server:     tt.fields.Server,
+				Port:       tt.fields.Port,
+				Workers:    tt.fields.Workers,
+				Quiet:      tt.fields.Quiet,
+				Full:       tt.fields.Full,
+				Debug:      tt.fields.Debug,
+				Timeout:    tt.fields.Timeout,
+				Delay:      tt.fields.Delay,
+				resolver:   tt.fields.resolver,
+				nameserver: tt.fields.nameserver,
+			}
+			if err := p.Printer(tt.args.hostname, tt.args.qtype, tt.args.duration, tt.args.results); (err != nil) != tt.wantErr {
+				t.Errorf("Preload.Printer() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func returnIntInterface() interface{} {
+	x := []int{1, 2, 3, 4, 5}
+	return x
+}
