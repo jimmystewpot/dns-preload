@@ -42,7 +42,8 @@ type Preload struct {
 	Server     string        `default:"localhost" help:"The server to query to seed the domain list into"`
 	Port       string        `default:"53" help:"The port the DNS server listens for requests on"`
 	Workers    uint8         `default:"1" help:"The number of concurrent goroutines used to query the DNS server (not implemented yet)"`
-	Quiet      bool          `default:"false" help:"Suppress the preload response output to console"`
+	Mute       bool          `default:"false" help:"Suppress the preload task output to the console"`
+	Quiet      bool          `default:"false" help:"Suppress the preload response output to the console"`
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Debug      bool          `default:"false" help:"Debug mode"`
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
@@ -70,27 +71,27 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 	switch cmd {
 	case confighandlers.Cname:
 		if cfg.QueryType.CnameCount != 0 {
-			fmt.Printf(preloadMessage, p.nameserver, cnameTypeStr, strings.Join(cfg.QueryType.Cname, ", "))
+			p.InfoPrinter(cnameTypeStr, cfg.QueryType.Cname)
 			return p.CNAME(ctx, cfg.QueryType.Cname)
 		}
 	case confighandlers.Hosts:
 		if cfg.QueryType.HostsCount != 0 {
-			fmt.Printf(preloadMessage, p.nameserver, aTypeStr, strings.Join(cfg.QueryType.Hosts, ", "))
+			p.InfoPrinter(aTypeStr, cfg.QueryType.Hosts)
 			return p.Hosts(ctx, cfg.QueryType.Hosts)
 		}
 	case confighandlers.Mx:
 		if cfg.QueryType.MXCount != 0 {
-			fmt.Printf(preloadMessage, p.nameserver, mxTypeStr, strings.Join(cfg.QueryType.MX, ", "))
+			p.InfoPrinter(mxTypeStr, cfg.QueryType.MX)
 			return p.MX(ctx, cfg.QueryType.MX)
 		}
 	case confighandlers.Ns:
 		if cfg.QueryType.NSCount != 0 {
-			fmt.Printf(preloadMessage, p.nameserver, nsTypeStr, strings.Join(cfg.QueryType.NS, ", "))
+			p.InfoPrinter(nsTypeStr, cfg.QueryType.NS)
 			return p.NS(ctx, cfg.QueryType.NS)
 		}
 	case confighandlers.Txt:
 		if cfg.QueryType.TXTCount != 0 {
-			fmt.Printf(preloadMessage, p.nameserver, txtTypeStr, strings.Join(cfg.QueryType.TXT, ", "))
+			p.InfoPrinter(txtTypeStr, cfg.QueryType.TXT)
 			return p.TXT(ctx, cfg.QueryType.TXT)
 		}
 	}
@@ -98,6 +99,13 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 		fmt.Printf(preloadErrMessage, cmd)
 	}
 	return nil
+}
+
+// InfoPrinter outputs the info on what domains and servers are being reloaded.
+func (p *Preload) InfoPrinter(queryType string, hosts []string) {
+	if !p.Mute {
+		fmt.Printf(preloadMessage, p.nameserver, queryType, strings.Join(hosts, ", "))
+	}
 }
 
 // Hosts preload the nameserver with IP addresses for a given list of hostnames.
@@ -108,7 +116,7 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], aTypeStr, time.Since(s), result)
+		err = p.ResultsPrinter(hosts[i], aTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -124,7 +132,7 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], cnameTypeStr, time.Since(s), result)
+		err = p.ResultsPrinter(hosts[i], cnameTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -140,7 +148,7 @@ func (p *Preload) NS(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], nsTypeStr, time.Since(s), result)
+		err = p.ResultsPrinter(hosts[i], nsTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -157,7 +165,7 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 			return err
 		}
 
-		err = p.Printer(hosts[i], mxTypeStr, time.Since(s), result)
+		err = p.ResultsPrinter(hosts[i], mxTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -173,7 +181,7 @@ func (p *Preload) TXT(ctx context.Context, hosts []string) error {
 		if err != nil {
 			return err
 		}
-		err = p.Printer(hosts[i], txtTypeStr, time.Since(s), result)
+		err = p.ResultsPrinter(hosts[i], txtTypeStr, time.Since(s), result)
 		if err != nil {
 			return err
 		}
@@ -182,7 +190,7 @@ func (p *Preload) TXT(ctx context.Context, hosts []string) error {
 }
 
 // String provides output to the console for the results of the preloading.
-func (p *Preload) Printer(hostname string, qtype string, duration time.Duration, results interface{}) error {
+func (p *Preload) ResultsPrinter(hostname string, qtype string, duration time.Duration, results interface{}) error {
 	// str is used to store the string conversions of the results.
 	str := make([]string, 0)
 	switch r := results.(type) {
@@ -224,7 +232,7 @@ func main() {
 	start = time.Now()
 	cmd := kong.Parse(&cli,
 		kong.Name(os.Args[0]),
-		kong.Description("Preload a series of Domain Names into a DNS server from a yaml configuration"),
+		kong.Description("Preload a DNS cache with a list of hostnames from a YAML configuration file."),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,

@@ -578,7 +578,7 @@ func TestPreloadPrinter(t *testing.T) {
 				resolver:   tt.fields.resolver,
 				nameserver: tt.fields.nameserver,
 			}
-			if err := p.Printer(tt.args.hostname, tt.args.qtype, tt.args.duration, tt.args.results); (err != nil) != tt.wantErr {
+			if err := p.ResultsPrinter(tt.args.hostname, tt.args.qtype, tt.args.duration, tt.args.results); (err != nil) != tt.wantErr {
 				t.Errorf("Preload.Printer() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
