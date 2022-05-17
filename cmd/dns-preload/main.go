@@ -236,22 +236,22 @@ func main() {
 		for _, queryType := range confighandlers.QueryTypes {
 			err := cmd.Run(queryType)
 			if err != nil {
-				e = append(e, err)
+				e = append(e, fmt.Errorf("quertyType: %s, err: %s", queryType, err))
 			}
 		}
+		fmt.Printf("Preload completed in %s\n", time.Since(start))
+
 		if len(e) != 0 {
-			fmt.Println(e)
-			cmd.FatalIfErrorf(e[0])
-			fmt.Printf("Preload unsuccessful in %s\n", time.Since(start))
+			var errLog error
+			for _, errLog = range e {
+				fmt.Printf("%s ", errLog)
+			}
+			cmd.FatalIfErrorf(errLog)
 			cmd.Exit(1)
 		}
 	default:
 		err := cmd.Run(cmd.Command())
-		if err != nil {
-			fmt.Println(err)
-		}
-		cmd.FatalIfErrorf(err)
 		fmt.Printf("Preload completed in %s\n", time.Since(start))
+		cmd.FatalIfErrorf(err)
 	}
-	fmt.Printf("Preload completed in %s\n", time.Since(start))
 }

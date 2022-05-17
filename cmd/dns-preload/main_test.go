@@ -557,7 +557,7 @@ func TestPreloadPrinter(t *testing.T) {
 			args: args{
 				hostname: testDomainNoErr,
 				qtype:    "foo",
-				duration: time.Duration(1 * time.Second),
+				duration: time.Second,
 				results:  returnIntInterface(),
 			},
 			wantErr: true,
