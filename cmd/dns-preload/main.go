@@ -253,4 +253,5 @@ func main() {
 		cmd.FatalIfErrorf(err)
 		fmt.Printf("Preload completed in %s\n", time.Since(start))
 	}
+	fmt.Printf("Preload completed in %s\n", time.Since(start))
 }
