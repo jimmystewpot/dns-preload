@@ -57,7 +57,6 @@ func (cfg *Configuration) LoadConfig(r io.Reader) error {
 func (cfg *Configuration) PopulateCounts() error {
 	var err error
 	cfg.QueryType.CnameCount, err = count(cfg.QueryType.Cname)
-	fmt.Println(cfg.QueryType.CnameCount)
 	if err != nil {
 		return err
 	}
