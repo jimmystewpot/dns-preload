@@ -30,6 +30,16 @@ type resolver struct {
 	client *net.Resolver
 }
 
+// WithResolver returns a custom resolver.
+func WithResolver(s interface{}, nameserver string, timeout time.Duration) Resolver {
+	switch s.(type) {
+	case mockresolver:
+		return NewMockResolver()
+	default:
+		return NewResolver(nameserver, timeout)
+	}
+}
+
 func NewResolver(nameserver string, timeout time.Duration) *resolver {
 	return &resolver{
 		client: &net.Resolver{
@@ -100,6 +110,17 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 	case "ns2.foo.bar":
 		ip2 := net.ParseIP(googlePubDns2)
 		return []net.IPAddr{
+			{
+				IP: ip2,
+			},
+		}, nil
+	case "dns.google.com":
+		ip1 := net.ParseIP(googlePubDns1)
+		ip2 := net.ParseIP(googlePubDns2)
+		return []net.IPAddr{
+			{
+				IP: ip1,
+			},
 			{
 				IP: ip2,
 			},

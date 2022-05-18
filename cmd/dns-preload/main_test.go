@@ -78,7 +78,6 @@ func TestPreloadHosts(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
 				nameserver: tt.fields.nameserver,
 			}
@@ -167,7 +166,6 @@ func TestPreloadMX(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
 				nameserver: tt.fields.nameserver,
 			}
@@ -241,7 +239,6 @@ func TestPreloadTXT(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
 				nameserver: net.JoinHostPort(tt.fields.Server, tt.fields.Port),
 			}
@@ -315,7 +312,6 @@ func TestPreloadNS(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
 				nameserver: net.JoinHostPort(tt.fields.Server, tt.fields.Port),
 			}
@@ -389,7 +385,6 @@ func TestPreloadCNAME(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
 				nameserver: tt.fields.nameserver,
 			}
@@ -513,7 +508,6 @@ func TestPreloadRunQueries(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   dns.NewMockResolver(),
 				nameserver: tt.fields.nameserver,
 			}
@@ -574,7 +568,6 @@ func TestPreloadPrinter(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				Delay:      tt.fields.Delay,
 				resolver:   tt.fields.resolver,
 				nameserver: tt.fields.nameserver,
 			}

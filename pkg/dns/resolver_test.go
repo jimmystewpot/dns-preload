@@ -2,6 +2,7 @@ package dns
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"reflect"
 	"testing"
@@ -340,6 +341,54 @@ func TestNewResolver(t *testing.T) {
 			resolver.LookupMX(context.Background(), testDomain)
 			resolver.LookupTXT(context.Background(), testDomain)
 			resolver.LookupNS(context.Background(), testDomain)
+		})
+	}
+}
+
+func TestWithResolver(t *testing.T) {
+	type args struct {
+		s          interface{}
+		nameserver string
+		timeout    time.Duration
+	}
+	tests := []struct {
+		name string
+		args args
+		want interface{}
+	}{
+		{
+			name: "Test net Resolver",
+			args: args{
+				s:          nil,
+				nameserver: "9.9.9.9:53",
+				timeout:    time.Duration(30 * time.Second),
+			},
+			want: resolver{},
+		},
+		{
+			name: "Test mock Resolver",
+			args: args{
+				s:          mockresolver{},
+				nameserver: "",
+				timeout:    time.Second,
+			},
+			want: resolver{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := WithResolver(tt.args.s, tt.args.nameserver, tt.args.timeout)
+			res, err := d.LookupIPAddr(context.Background(), "dns.google.com")
+			if err != nil {
+				t.Errorf("expected dns results got error %s", err)
+			}
+			fmt.Println(res, err)
+			for _, r := range res {
+				fmt.Println(res[0].IP.String())
+				if (r.IP.String() != googlePubDns1) && (r.IP.String() != googlePubDns2) {
+					t.Errorf("expected results %s or %s got %+v", googlePubDns1, googlePubDns2, res)
+				}
+			}
 		})
 	}
 }
