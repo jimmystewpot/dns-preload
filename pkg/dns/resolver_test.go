@@ -2,7 +2,6 @@ package dns
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"reflect"
 	"testing"
@@ -378,13 +377,11 @@ func TestWithResolver(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			d := WithResolver(tt.args.s, tt.args.nameserver, tt.args.timeout)
-			res, err := d.LookupIPAddr(context.Background(), "dns.google.com")
+			res, err := d.LookupIPAddr(context.Background(), "dns.oranged.to")
 			if err != nil {
 				t.Errorf("expected dns results got error %s", err)
 			}
-			fmt.Println(res, err)
 			for _, r := range res {
-				fmt.Println(res[0].IP.String())
 				if (r.IP.String() != googlePubDns1) && (r.IP.String() != googlePubDns2) {
 					t.Errorf("expected results %s or %s got %+v", googlePubDns1, googlePubDns2, res)
 				}

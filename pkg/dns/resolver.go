@@ -114,7 +114,7 @@ func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 				IP: ip2,
 			},
 		}, nil
-	case "dns.google.com":
+	case "dns.oranged.to":
 		ip1 := net.ParseIP(googlePubDns1)
 		ip2 := net.ParseIP(googlePubDns2)
 		return []net.IPAddr{
