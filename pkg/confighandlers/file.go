@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // ReadConfig wil read the YAML file from disk and render it into the DomainConfig struct.
