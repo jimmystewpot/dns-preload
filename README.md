@@ -14,7 +14,7 @@ It also works well on trains with crappy reception.
 Add an @reboot line to your users crontab so when the host reboots it will run the tool to pre-populate the dns server
 with the entries that you wish to use.
 
-`dns-preload all --config-file==dns-preload.yaml --full --quiet --server=::1`
+`dns-preload all --config-file=dns-preload.yaml --full --quiet --server=::1`
 
 Can be added to crontab as a user `crontab -e`
 
@@ -24,6 +24,25 @@ replace $HOME with where you have placed the executable.
 ### Configuration
 
 An example configuration file can be found at `example-config.yaml` in the root of the repository.
+
+Alternatively a configuration can be generated and printed to stdout using
+
+`dns-preload config`
+
+Example:
+
+```
+./dns-preload config
+---
+query_type:
+    cname: []
+    hosts: []
+    ns: []
+    mx: []
+    txt: []
+
+```
+To write this to a file append `> config.yaml` e.g. `./dns-preload config > config.yaml`
 
 ### Building
 

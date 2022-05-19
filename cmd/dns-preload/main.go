@@ -26,13 +26,14 @@ const (
 
 var (
 	cli struct {
-		All   Preload       `cmd:"" help:"preload all of the following types from the configuration file"`
-		Cname Preload       `cmd:"" help:"preload only the cname entries from the configuration file"`
-		Hosts Preload       `cmd:"" help:"preload only the hosts entries from the configuration file, this does an A and AAAA lookup"`
-		Mx    Preload       `cmd:"" help:"preload only the mx entries from the configuration file"`
-		Ns    Preload       `cmd:"" help:"preload only the ns entries from the configuration file"`
-		Txt   Preload       `cmd:"" help:"preload only the txt entries from the configuration file"`
-		Delay time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
+		All    Preload       `cmd:"" help:"preload all of the following types from the configuration file"`
+		Cname  Preload       `cmd:"" help:"preload only the cname entries from the configuration file"`
+		Hosts  Preload       `cmd:"" help:"preload only the hosts entries from the configuration file, this does an A and AAAA lookup"`
+		Mx     Preload       `cmd:"" help:"preload only the mx entries from the configuration file"`
+		Ns     Preload       `cmd:"" help:"preload only the ns entries from the configuration file"`
+		Txt    Preload       `cmd:"" help:"preload only the txt entries from the configuration file"`
+		Config Config        `cmd:"" help:"generate an empty configuration file to stdout"`
+		Delay  time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
 	}
 	start time.Time
 )
@@ -49,6 +50,16 @@ type Preload struct {
 	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
 	resolver   dns.Resolver
 	nameserver string
+}
+
+type Config struct {
+	Quiet bool `default:"true" help:"Suppress the info output to the console"`
+}
+
+// Config Run() prints an empty YAML configuration to stdout.
+func (c *Config) Run() error {
+	cfg := confighandlers.Configuration{}
+	return cfg.PrintEmptyConfigration()
 }
 
 func (p *Preload) Run(cmd string) error {
@@ -258,6 +269,9 @@ func main() {
 			cmd.FatalIfErrorf(errLog)
 			cmd.Exit(1)
 		}
+	case "config":
+		err := cmd.Run()
+		cmd.FatalIfErrorf(err)
 	default:
 		err := cmd.Run(cmd.Command())
 		fmt.Printf("Preload completed in %s\n", time.Since(start))
