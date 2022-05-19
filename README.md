@@ -70,20 +70,22 @@ To write this to a file append `> config.yaml` e.g. `./dns-preload config > conf
 dns-preload --help
 Usage: dns-preload <command>
 
-Preload a series of Domain Names into a DNS server from a yaml configuration
+Preload a DNS cache with a list of hostnames from a YAML configuration file.
 
 Flags:
-  -h, --help    Show context-sensitive help.
+  -h, --help        Show context-sensitive help.
+      --delay=0s    How long to wait until the queries are executed
 
 Commands:
-  all      preload all of the following types from the configuration file
-  cname    preload only the cname entries from the configuration file
-  hosts    preload only the hosts entries from the configuration file, this does an A and AAAA lookup
-  mx       preload only the mx entries from the configuration file
-  ns       preload only the ns entries from the configuration file
-  txt      preload only the txt entries from the configuration file
+  all       preload all of the following types from the configuration file
+  cname     preload only the cname entries from the configuration file
+  hosts     preload only the hosts entries from the configuration file, this does an A and AAAA lookup
+  mx        preload only the mx entries from the configuration file
+  ns        preload only the ns entries from the configuration file
+  txt       preload only the txt entries from the configuration file
+  config    generate an empty configuration file to stdout
 
-Run "./dns-preload <command> --help" for more information on a command.
+Run "dns-preload <command> --help" for more information on a command.
 ```
 
 all of the commands above have the same flags.
@@ -96,13 +98,17 @@ preload all of the following types from the configuration file
 
 Flags:
   -h, --help                  Show context-sensitive help.
+      --delay=0s              How long to wait until the queries are executed
 
       --config-file=STRING    The configuration file to read the domain list to query from
       --server="localhost"    The server to query to seed the domain list into
-      --port="53"             The port to query for on the DNS server
-      --workers=5             The number of concurrent goroutines used to query the DNS server
-      --quiet                 Suppress the preload response output to console
+      --port="53"             The port the DNS server listens for requests on
+      --workers=1             The number of concurrent goroutines used to query the DNS server (not implemented)
+      --mute                  Suppress the preload task output to the console
+      --quiet                 Suppress the preload response output to the console
       --full                  For record types that return a Hostname ensure that these are resolved
+      --debug                 Debug mode
       --timeout=30s           The timeout for DNS queries to succeed
-      --delay=0s              How long to wait until the queries are executed
+
+dns-preload: error: unexpected argument help
 ```
