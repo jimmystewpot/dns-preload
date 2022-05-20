@@ -582,3 +582,61 @@ func returnIntInterface() interface{} {
 	x := []int{1, 2, 3, 4, 5}
 	return x
 }
+
+func TestConfig_Run(t *testing.T) {
+	type fields struct {
+		Quiet    bool
+		Generate bool
+		Validate struct{ ConfigFile string }
+	}
+	type args struct {
+		cmd string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Generate",
+			fields: fields{
+				Quiet: true,
+			},
+			args: args{
+				cmd: "config generate",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Validate",
+			fields: fields{
+				Quiet: true,
+			},
+			args: args{
+				cmd: "config validate",
+			},
+			wantErr: true,
+		},
+		{
+			name: "error",
+			fields: fields{
+				Quiet: true,
+			},
+			args: args{
+				cmd: "foo",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Config{
+				Quiet: tt.fields.Quiet,
+			}
+			if err := c.Run(tt.args.cmd); (err != nil) != tt.wantErr {
+				t.Errorf("Config.Run() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

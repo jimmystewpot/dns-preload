@@ -20,8 +20,9 @@ const (
 	queryTypeMXStr    string = "MX"
 	queryTypeNSStr    string = "NS"
 	queryTypeTXTStr   string = "TXT"
-	infoMessage       string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
-	qTypeErrMessage   string = "Preloading error: query type %s has no entries in the configuration\n"
+	// print messages that are used more than once.
+	infoMessage     string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
+	qTypeErrMessage string = "Preloading error: query type %s has no entries in the configuration\n"
 )
 
 var (
@@ -53,13 +54,25 @@ type Preload struct {
 }
 
 type Config struct {
-	Quiet bool `default:"true" help:"Suppress the info output to the console"`
+	Quiet    bool `default:"true" help:"Suppress the info output to the console"`
+	Generate struct {
+		Generate bool `default:"true" help:"Generate an empty configuration and output it to stdout"`
+	} `cmd:"" help:"Generate a configuration file"`
+	Validate struct {
+		ConfigFile string `required:"" help:"The configuration file to load"`
+	} `cmd:"" help:"Validate a configuration file"`
 }
 
 // Config Run() prints an empty YAML configuration to stdout.
-func (c *Config) Run() error {
-	cfg := confighandlers.Configuration{}
-	return cfg.PrintEmptyConfigration()
+func (c *Config) Run(cmd string) error {
+	switch cmd {
+	case "config generate":
+		cfg := confighandlers.Configuration{}
+		return cfg.PrintEmptyConfigration()
+	case "config validate":
+		return fmt.Errorf("not yet implemented")
+	}
+	return nil
 }
 
 func (p *Preload) Run(cmd string) error {
@@ -270,7 +283,7 @@ func main() {
 			cmd.Exit(1)
 		}
 	case "config":
-		err := cmd.Run()
+		err := cmd.Run(cmd.Command())
 		cmd.FatalIfErrorf(err)
 	default:
 		err := cmd.Run(cmd.Command())
