@@ -72,7 +72,7 @@ func (c *Config) Run(cmd string) error {
 	case "config validate":
 		return fmt.Errorf("not yet implemented")
 	}
-	return nil
+	return fmt.Errorf("unknown command %s", cmd)
 }
 
 func (p *Preload) Run(cmd string) error {
