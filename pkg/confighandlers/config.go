@@ -83,11 +83,13 @@ func Uint16(s []string) (uint16, error) {
 }
 
 // PrintEmptyConfiguration is used to generate an empty configuration to stdout
-func (cfg *Configuration) PrintEmptyConfigration() error {
+func (cfg *Configuration) PrintEmptyConfigration(quiet bool) error {
 	yamlConfiguration, err := yaml.Marshal(&Configuration{})
 	if err != nil {
 		return err
 	}
-	fmt.Printf("---\n%s\n\n", string(yamlConfiguration))
+	if !quiet {
+		fmt.Printf("---\n%s\n\n", string(yamlConfiguration))
+	}
 	return nil
 }

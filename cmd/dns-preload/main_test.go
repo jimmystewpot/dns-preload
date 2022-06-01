@@ -494,6 +494,20 @@ func TestPreloadRunQueries(t *testing.T) {
 			args: args{
 				cmd: "foo",
 			},
+			wantErr: true,
+		},
+		{
+			name: "good config test - cname with no entries",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_no_cname_config.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Debug:      true,
+			},
+			args: args{
+				cmd: "cname",
+			},
 			wantErr: false,
 		},
 	}
@@ -583,7 +597,7 @@ func returnIntInterface() interface{} {
 	return x
 }
 
-func TestConfig_Run(t *testing.T) {
+func TestConfigRun(t *testing.T) {
 	type fields struct {
 		Quiet    bool
 		Generate bool
@@ -637,6 +651,107 @@ func TestConfig_Run(t *testing.T) {
 			if err := c.Run(tt.args.cmd); (err != nil) != tt.wantErr {
 				t.Errorf("Config.Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
+		})
+	}
+}
+
+func TestPreloadRun(t *testing.T) {
+	type fields struct {
+		ConfigFile string
+		Server     string
+		Port       string
+		Workers    uint8
+		Mute       bool
+		Quiet      bool
+		Full       bool
+		Debug      bool
+		Timeout    time.Duration
+		resolver   dns.Resolver
+		nameserver string
+	}
+	type args struct {
+		cmd string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "generate an error with good config",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+			},
+			args: args{
+				cmd: "does not exist",
+			},
+			wantErr: true,
+		},
+		{
+			name: "generate an error with bad config",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/bad_configuration_sample.yaml",
+			},
+			args: args{
+				cmd: "does not exist",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &Preload{
+				ConfigFile: tt.fields.ConfigFile,
+				Server:     tt.fields.Server,
+				Port:       tt.fields.Port,
+				Workers:    tt.fields.Workers,
+				Mute:       tt.fields.Mute,
+				Quiet:      tt.fields.Quiet,
+				Full:       tt.fields.Full,
+				Debug:      tt.fields.Debug,
+				Timeout:    tt.fields.Timeout,
+				resolver:   tt.fields.resolver,
+				nameserver: tt.fields.nameserver,
+			}
+			if err := p.Run(tt.args.cmd); (err != nil) != tt.wantErr {
+				t.Errorf("Preload.Run() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_completedPrinter(t *testing.T) {
+	start := time.Now()
+	type args struct {
+		quiet bool
+		t     time.Time
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test quiet mode",
+			args: args{
+				quiet: true,
+				t:     start,
+			},
+			want: "",
+		},
+		{
+			name: "test normal mode",
+			args: args{
+				quiet: false,
+				t:     start,
+			},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			completedPrinter(tt.args.quiet, tt.args.t)
 		})
 	}
 }

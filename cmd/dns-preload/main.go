@@ -21,8 +21,10 @@ const (
 	queryTypeNSStr    string = "NS"
 	queryTypeTXTStr   string = "TXT"
 	// print messages that are used more than once.
-	infoMessage     string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
-	qTypeErrMessage string = "Preloading error: query type %s has no entries in the configuration\n"
+	infoMessage          string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
+	qTypeEmptyErrMessage string = "Preloading error: query type %s has no entries in the configuration"
+	qTypeErrMessage      string = "preloading error: query type %s is not a valid query type"
+	completedMessage     string = "Preload completed in %s"
 )
 
 var (
@@ -37,6 +39,7 @@ var (
 		Delay  time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
 	}
 	start time.Time
+	quiet bool
 )
 
 type Preload struct {
@@ -54,7 +57,7 @@ type Preload struct {
 }
 
 type Config struct {
-	Quiet    bool `default:"true" help:"Suppress the info output to the console"`
+	Quiet    bool `default:"false" help:"Suppress the info output to the console"`
 	Generate struct {
 		Generate bool `default:"true" help:"Generate an empty configuration and output it to stdout"`
 	} `cmd:"" help:"Generate a configuration file"`
@@ -68,7 +71,7 @@ func (c *Config) Run(cmd string) error {
 	switch cmd {
 	case "config generate":
 		cfg := confighandlers.Configuration{}
-		return cfg.PrintEmptyConfigration()
+		return cfg.PrintEmptyConfigration(c.Quiet)
 	case "config validate":
 		return fmt.Errorf("not yet implemented")
 	}
@@ -76,6 +79,7 @@ func (c *Config) Run(cmd string) error {
 }
 
 func (p *Preload) Run(cmd string) error {
+	quiet = p.Quiet
 	cfg, err := confighandlers.LoadConfigFromFile(&p.ConfigFile)
 	if err != nil {
 		return err
@@ -116,9 +120,11 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 			p.IntroPrinter(queryTypeTXTStr, cfg.QueryType.TXT)
 			return p.TXT(ctx, cfg.QueryType.TXT)
 		}
+	default: // no known query type fallback error handling.
+		return fmt.Errorf(qTypeErrMessage, cmd)
 	}
 	if p.Debug {
-		fmt.Printf(qTypeErrMessage, cmd)
+		fmt.Printf(qTypeEmptyErrMessage+"\n", cmd)
 	}
 	return nil
 }
@@ -247,7 +253,14 @@ func (p *Preload) ResultsPrinter(hostname string, qtype string, duration time.Du
 // IntroPrinter outputs the info on what domains and servers are being reloaded.
 func (p *Preload) IntroPrinter(queryType string, hosts []string) {
 	if !p.Mute {
-		fmt.Printf(infoMessage, p.nameserver, queryType, strings.Join(hosts, ", "))
+		fmt.Printf(infoMessage+"\n", p.nameserver, queryType, strings.Join(hosts, ", "))
+	}
+}
+
+// CompletedPrinter prints out a completion message and a timer to stdout.
+func completedPrinter(quiet bool, t time.Time) {
+	if !quiet {
+		fmt.Printf(completedMessage+"\n", time.Since(start))
 	}
 }
 
@@ -272,7 +285,7 @@ func main() {
 				e = append(e, fmt.Errorf("quertyType: %s, err: %s", queryType, err))
 			}
 		}
-		fmt.Printf("Preload completed in %s\n", time.Since(start))
+		completedPrinter(quiet, start)
 
 		if len(e) != 0 {
 			var errLog error
@@ -280,14 +293,10 @@ func main() {
 				fmt.Printf("%s ", errLog)
 			}
 			cmd.FatalIfErrorf(errLog)
-			cmd.Exit(1)
 		}
-	case "config":
-		err := cmd.Run(cmd.Command())
-		cmd.FatalIfErrorf(err)
 	default:
 		err := cmd.Run(cmd.Command())
-		fmt.Printf("Preload completed in %s\n", time.Since(start))
+		completedPrinter(quiet, start)
 		cmd.FatalIfErrorf(err)
 	}
 }
