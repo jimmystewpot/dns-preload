@@ -14,3 +14,5 @@ require (
 	github.com/stretchr/testify v1.7.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
+
+replace gopkg.in/yaml.v3 => gopkg.in/yaml.v3 v3.0.1
