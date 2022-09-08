@@ -583,6 +583,34 @@ func TestPreloadRunQueries(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "good config test - ptr with entries",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_data_config.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Debug:      true,
+			},
+			args: args{
+				cmd: "ptr",
+			},
+			wantErr: false,
+		},
+		{
+			name: "good config test - ptr with no entries",
+			fields: fields{
+				ConfigFile: "../../pkg/confighandlers/test_data/basic_test_no_cname_config.yaml",
+				Server:     testDNSServer,
+				Port:       testDNSServerPort,
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Debug:      true,
+			},
+			args: args{
+				cmd: "ptr",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
