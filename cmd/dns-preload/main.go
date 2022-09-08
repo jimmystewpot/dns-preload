@@ -20,6 +20,7 @@ const (
 	queryTypeMXStr    string = "MX"
 	queryTypeNSStr    string = "NS"
 	queryTypeTXTStr   string = "TXT"
+	queryTypePTRStr   string = "PTR"
 	// print messages that are used more than once.
 	infoMessage          string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
 	qTypeEmptyErrMessage string = "Preloading error: query type %s has no entries in the configuration"
@@ -35,6 +36,7 @@ var (
 		Mx     Preload       `cmd:"" help:"preload only the mx entries from the configuration file"`
 		Ns     Preload       `cmd:"" help:"preload only the ns entries from the configuration file"`
 		Txt    Preload       `cmd:"" help:"preload only the txt entries from the configuration file"`
+		Ptr    Preload       `cmd:"" help:"preload only the ptr entries from the configuration file"`
 		Config Config        `cmd:"" help:"generate an empty configuration file to stdout"`
 		Delay  time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
 	}
@@ -119,6 +121,11 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 		if cfg.QueryType.TXTCount != 0 {
 			p.IntroPrinter(queryTypeTXTStr, cfg.QueryType.TXT)
 			return p.TXT(ctx, cfg.QueryType.TXT)
+		}
+	case confighandlers.Ptr:
+		if cfg.QueryType.PTRCount != 0 {
+			p.IntroPrinter(queryTypePTRStr, cfg.QueryType.PTR)
+			return p.PTR(ctx, cfg.QueryType.PTR)
 		}
 	default: // no known query type fallback error handling.
 		return fmt.Errorf(qTypeErrMessage, cmd)
@@ -210,6 +217,22 @@ func (p *Preload) TXT(ctx context.Context, hosts []string) error {
 	return nil
 }
 
+// PTR preloads the nameserver with the PTR records for a given list of hostnames.
+func (p *Preload) PTR(ctx context.Context, hosts []string) error {
+	for i := 0; i < len(hosts); i++ {
+		s := time.Now()
+		result, err := p.resolver.LookupAddr(ctx, hosts[i])
+		if err != nil {
+			return err
+		}
+		err = p.ResultsPrinter(hosts[i], queryTypePTRStr, time.Since(s), result)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // String provides output to the console for the results of the preloading.
 func (p *Preload) ResultsPrinter(hostname string, qtype string, duration time.Duration, results interface{}) error {
 	// str is used to store the string conversions of the results.
@@ -260,7 +283,7 @@ func (p *Preload) IntroPrinter(queryType string, hosts []string) {
 // CompletedPrinter prints out a completion message and a timer to stdout.
 func completedPrinter(quiet bool, t time.Time) {
 	if !quiet {
-		fmt.Printf(completedMessage+"\n", time.Since(start))
+		fmt.Printf(completedMessage+"\n", time.Since(t))
 	}
 }
 

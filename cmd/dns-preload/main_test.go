@@ -13,6 +13,7 @@ import (
 const (
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
+	testPtrNoErr      string = "2404:6800:4006:804::200e"
 	testDNSServer     string = "9.9.9.9"
 	testDNSServerPort string = "53"
 )
@@ -83,6 +84,78 @@ func TestPreloadHosts(t *testing.T) {
 			}
 			if err := p.Hosts(tt.args.ctx, tt.args.hosts); (err != nil) != tt.wantErr {
 				t.Errorf("Preload.Hosts() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPreloadPtr(t *testing.T) {
+	ctx := context.Background()
+	type fields struct {
+		ConfigFile string
+		Server     string
+		Port       string
+		Workers    uint8
+		Quiet      bool
+		Full       bool
+		Debug      bool
+		Timeout    time.Duration
+		Delay      time.Duration
+		resolver   dns.Resolver
+		nameserver string
+	}
+	type args struct {
+		ctx   context.Context
+		hosts []string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Test Case Without Error",
+			fields: fields{
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+			},
+			args: args{
+				ctx:   ctx,
+				hosts: []string{testPtrNoErr},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Test Case With Error",
+			fields: fields{
+				resolver:   dns.NewMockResolver(),
+				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Quiet:      false,
+			},
+			args: args{
+				ctx:   ctx,
+				hosts: []string{testDomainNoErr},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := &Preload{
+				ConfigFile: tt.fields.ConfigFile,
+				Server:     tt.fields.Server,
+				Port:       tt.fields.Port,
+				Workers:    tt.fields.Workers,
+				Quiet:      tt.fields.Quiet,
+				Full:       tt.fields.Full,
+				Debug:      tt.fields.Debug,
+				Timeout:    tt.fields.Timeout,
+				resolver:   tt.fields.resolver,
+				nameserver: tt.fields.nameserver,
+			}
+			if err := p.PTR(tt.args.ctx, tt.args.hosts); (err != nil) != tt.wantErr {
+				t.Errorf("Preload.PTR() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

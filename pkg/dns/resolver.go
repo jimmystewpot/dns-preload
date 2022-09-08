@@ -15,12 +15,14 @@ const (
 	testDomainMX0     string = "mx0.foo.bar"
 	testDomainMX1     string = "mx1.foo.bar"
 	testDomainNS1     string = "ns1.foo.bar"
+	testPtrNoErr      string = "2404:6800:4006:804::200e"
 	nxDomainErr       string = "nxdomain %s"
 )
 
 type Resolver interface {
 	LookupCNAME(ctx context.Context, host string) (string, error)
 	LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error)
+	LookupAddr(ctx context.Context, addr string) ([]string, error)
 	LookupNS(ctx context.Context, host string) ([]*net.NS, error)
 	LookupTXT(ctx context.Context, host string) ([]string, error)
 	LookupMX(ctx context.Context, host string) ([]*net.MX, error)
@@ -60,6 +62,11 @@ func (r *resolver) LookupCNAME(ctx context.Context, host string) (string, error)
 	return r.client.LookupCNAME(ctx, host)
 }
 
+// LookupAddr returns the net.Resolver LookupAddr
+func (r *resolver) LookupAddr(ctx context.Context, host string) ([]string, error) {
+	return r.client.LookupAddr(ctx, host)
+}
+
 // LookupIPAddr returns the net.Resolver LookupIPAddr
 func (r *resolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
 	return r.client.LookupIPAddr(ctx, host)
@@ -96,6 +103,13 @@ func (m *mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 		return "", fmt.Errorf(nxDomainErr, host)
 	}
 	return "", fmt.Errorf(nxDomainErr, host)
+}
+
+func (m *mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
+	if addr != "2404:6800:4006:804::200e" {
+		return []string{}, fmt.Errorf("%s ptr not found", addr)
+	}
+	return []string{"ipv6.google.com"}, nil
 }
 
 func (m *mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
