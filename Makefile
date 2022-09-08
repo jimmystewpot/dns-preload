@@ -52,7 +52,8 @@ test-all: deps lint test
 deps:
 	@echo ""
 	@echo "***** Installing dependencies for ${TOOL} *****"
-	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
+	go clean --cache
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
 
 dns-preload:
 	@echo ""
