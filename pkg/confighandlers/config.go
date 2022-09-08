@@ -12,11 +12,12 @@ const (
 	Txt   string = "txt"
 	Cname string = "cname"
 	Hosts string = "hosts"
+	Ptr   string = "ptr"
 )
 
 var (
 	// queryTypes is used to iterate through all of the commands when the all cmd is used.
-	QueryTypes = []string{Hosts, Cname, Mx, Ns, Txt}
+	QueryTypes = []string{Hosts, Cname, Mx, Ns, Txt, Ptr}
 )
 
 type Configuration struct {
@@ -40,6 +41,9 @@ type QueryType struct {
 	// TXT for doing a query for type TXT
 	TXT      []string `yaml:"txt" json:"txt"`
 	TXTCount uint16   `yaml:",omitempty"`
+	// PTR for doing a query for type PTR
+	PTR      []string `yaml:"ptr" json:"ptr"`
+	PTRCount uint16   `yaml:",omitempty"`
 }
 
 // PopulateCounts for how many domains are in each query_type.
@@ -62,6 +66,10 @@ func (cfg *Configuration) PopulateCounts() error {
 		return err
 	}
 	cfg.QueryType.TXTCount, err = count(cfg.QueryType.TXT)
+	if err != nil {
+		return err
+	}
+	cfg.QueryType.PTRCount, err = count(cfg.QueryType.PTR)
 	if err != nil {
 		return err
 	}

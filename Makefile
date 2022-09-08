@@ -3,10 +3,10 @@ SHELL  := /bin/bash
 
 
 TOOL := dns-preload
-export PATH = /usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/build/bin:/home/runner/go:/home/runner/go/bin:
+export PATH = $(shell echo $$PATH):/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/build/bin:/home/runner/go:/home/runner/go/bin:
 BINPATH := bin
 GO_DIR := src/github.com/jimmystewpot/dns-preload/
-DOCKER_IMAGE := golang:1.18-bullseye
+DOCKER_IMAGE := golang:1.19-bullseye
 SYNK_IMAGE := snyk/snyk:golang
 INTERACTIVE := $(shell [ -t 0 ] && echo 1)
 TEST_DIRS := ./cmd/...
@@ -50,29 +50,32 @@ build-all: deps test lint dns-preload
 test-all: deps lint test
 
 deps:
-	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.1
+	@echo ""
+	@echo "***** Installing dependencies for ${TOOL} *****"
+	go clean --cache
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
 
 dns-preload:
 	@echo ""
-	@echo "***** Building $$TOOL *****"
+	@echo "***** Building ${TOOL} *****"
 	go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
 linux-arm64:
 	@echo ""
-	@echo "***** Building $$TOOL for Linux ARM64 *****"
+	@echo "***** Building ${TOOL} for Linux ARM64 *****"
 	GOOS=linux GOARCH=arm64 go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
 linux-x64:
 	@echo ""
-	@echo "***** Building $$TOOL for Linux x86-64 *****"
+	@echo "***** Building ${TOOL} for Linux x86-64 *****"
 	GOOS=linux GOARCH=amd64 go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
 linux-arm32:
 	@echo ""
-	@echo "***** Building $$TOOL for Linux ARM32 *****"
+	@echo "***** Building ${TOOL} for Linux ARM32 *****"
 	GOOS=linux GOARCH=arm go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 

@@ -9,5 +9,6 @@ query_type:
   txt:
   - foo.bar
   cname: []
+  ptr: []
 
 

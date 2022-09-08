@@ -64,6 +64,52 @@ func TestResolverLookupAll(t *testing.T) {
 	}
 }
 
+func TestMockresolverLookupAddr(t *testing.T) {
+	type args struct {
+		ctx  context.Context
+		host string
+	}
+	tests := []struct {
+		name    string
+		m       *mockresolver
+		args    args
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "valid a lookup",
+			args: args{
+				ctx:  context.Background(),
+				host: testPtrNoErr,
+			},
+			want:    []string{"ipv6.google.com"},
+			wantErr: false,
+		},
+		{
+			name: "invalid a lookup",
+			args: args{
+				ctx:  context.Background(),
+				host: testDomainWithErr,
+			},
+			want:    []string{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &mockresolver{}
+			got, err := m.LookupAddr(tt.args.ctx, tt.args.host)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("mockresolver.LookupAddr() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("mockresolver.LookupAddr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestMockresolverLookupIPAddr(t *testing.T) {
 	type args struct {
 		ctx  context.Context
@@ -340,6 +386,8 @@ func TestNewResolver(t *testing.T) {
 			resolver.LookupMX(context.Background(), testDomain)
 			resolver.LookupTXT(context.Background(), testDomain)
 			resolver.LookupNS(context.Background(), testDomain)
+			resolver.LookupAddr(context.Background(), testPtrNoErr)
+			resolver.LookupCNAME(context.Background(), testDomain)
 		})
 	}
 }
