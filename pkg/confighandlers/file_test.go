@@ -187,6 +187,20 @@ func TestQueryListPopulateCounts(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "overload test ptr",
+			fields: fields{
+				QueryType{
+					PTR: garbage(100000000),
+				},
+			},
+			want: fields{
+				QueryType{
+					PTRCount: uint16(0),
+				},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
