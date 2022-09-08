@@ -386,6 +386,8 @@ func TestNewResolver(t *testing.T) {
 			resolver.LookupMX(context.Background(), testDomain)
 			resolver.LookupTXT(context.Background(), testDomain)
 			resolver.LookupNS(context.Background(), testDomain)
+			resolver.LookupAddr(context.Background(), testPtrNoErr)
+			resolver.LookupCNAME(context.Background(), testDomain)
 		})
 	}
 }
