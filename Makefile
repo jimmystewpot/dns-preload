@@ -25,6 +25,8 @@ clean:
 	@echo $(shell docker images -qa -f 'dangling=true'|egrep '[a-z0-9]+' && docker rmi $(shell docker images -qa -f 'dangling=true'))
 
 lint:
+	@echo ""
+	@echo "***** linting ${TOOL} with golangci-lint *****"
 ifdef INTERACTIVE
 	golangci-lint run -v $(TEST_DIRS)
 else
