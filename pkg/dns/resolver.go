@@ -10,6 +10,7 @@ import (
 const (
 	googlePubDns1     string = "8.8.4.4"
 	googlePubDns2     string = "8.8.8.8"
+	googleIpv6        string = "2404:6800:4006:804::200e"
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
 	testDomainMX0     string = "mx0.foo.bar"
@@ -106,7 +107,7 @@ func (m *mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 }
 
 func (m *mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
-	if addr != "2404:6800:4006:804::200e" {
+	if addr != googleIpv6 {
 		return []string{}, fmt.Errorf("%s ptr not found", addr)
 	}
 	return []string{"ipv6.google.com"}, nil

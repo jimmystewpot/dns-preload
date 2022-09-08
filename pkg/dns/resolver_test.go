@@ -100,11 +100,11 @@ func TestMockresolverLookupAddr(t *testing.T) {
 			m := &mockresolver{}
 			got, err := m.LookupAddr(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("mockresolver.LookupIPAddr() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("mockresolver.LookupAddr() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("mockresolver.LookupIPAddr() = %v, want %v", got, tt.want)
+				t.Errorf("mockresolver.LookupAddr() = %v, want %v", got, tt.want)
 			}
 		})
 	}
