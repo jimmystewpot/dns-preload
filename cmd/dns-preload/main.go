@@ -11,6 +11,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/jimmystewpot/dns-preload/pkg/confighandlers"
 	"github.com/jimmystewpot/dns-preload/pkg/dns"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -23,6 +24,7 @@ const (
 	queryTypePTRStr   string = "PTR"
 	// print messages that are used more than once.
 	infoMessage          string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
+	batchMessage         string = "Preloaded batch for query type: %s completed in: %s\n"
 	qTypeEmptyErrMessage string = "Preloading error: query type %s has no entries in the configuration"
 	qTypeErrMessage      string = "preloading error: query type %s is not a valid query type"
 	completedMessage     string = "Preload completed in %s"
@@ -48,12 +50,12 @@ type Preload struct {
 	ConfigFile string        `required:"" help:"The configuration file to read the domain list to query from"`
 	Server     string        `default:"localhost" help:"The server to query to seed the domain list into"`
 	Port       string        `default:"53" help:"The port the DNS server listens for requests on"`
-	Workers    uint8         `default:"1" help:"The number of concurrent goroutines used to query the DNS server (not implemented)"`
+	Workers    uint8         `default:"1" help:"The number of concurrent goroutines used to query the DNS server"`
 	Mute       bool          `default:"false" help:"Suppress the preload task output to the console"`
 	Quiet      bool          `default:"false" help:"Suppress the preload response output to the console"`
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Debug      bool          `default:"false" help:"Debug mode"`
-	Timeout    time.Duration `default:"30s" help:"The timeout for DNS queries to succeed"`
+	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed (not implemented)"`
 	resolver   dns.Resolver
 	nameserver string
 }
@@ -91,6 +93,7 @@ func (p *Preload) Run(cmd string) error {
 	p.resolver = dns.NewResolver(p.nameserver, p.Timeout)
 
 	ctx := context.Background()
+
 	return p.RunQueries(ctx, cmd, cfg)
 }
 
@@ -137,99 +140,208 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 }
 
 // Hosts preload the nameserver with IP addresses for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
-		s := time.Now()
-		result, err := p.resolver.LookupIPAddr(ctx, hosts[i])
-		if err != nil {
-			return err
-		}
-		err = p.ResultsPrinter(hosts[i], queryTypeAStr, time.Since(s), result)
-		if err != nil {
-			return err
-		}
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupIPAddr(deadline, host)
+			if err != nil {
+				return err
+			}
+			err = p.ResultsPrinter(host, queryTypeAStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	}
+	// wait for all of the goroutines in the error group to complete, any errors are handled uniformly.
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypeAStr, time.Since(batch))
+	}
+
 	return nil
 }
 
 // CNAME preload the nameserver with CNAME lookups for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
-		s := time.Now()
-		result, err := p.resolver.LookupCNAME(ctx, hosts[i])
-		if err != nil {
-			return err
-		}
-		err = p.ResultsPrinter(hosts[i], queryTypeCNAMEStr, time.Since(s), result)
-		if err != nil {
-			return err
-		}
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupCNAME(deadline, host)
+			if err != nil {
+				return err
+			}
+			err = p.ResultsPrinter(host, queryTypeCNAMEStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	}
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypeCNAMEStr, time.Since(batch))
+	}
+
 	return nil
 }
 
 // NS preloads the nameserver records for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) NS(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
-		s := time.Now()
-		result, err := p.resolver.LookupNS(ctx, hosts[i])
-		if err != nil {
-			return err
-		}
-		err = p.ResultsPrinter(hosts[i], queryTypeNSStr, time.Since(s), result)
-		if err != nil {
-			return err
-		}
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupNS(deadline, host)
+			if err != nil {
+				return err
+			}
+			err = p.ResultsPrinter(host, queryTypeNSStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	}
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypeNSStr, time.Since(batch))
+	}
+
 	return nil
 }
 
 // MX preloads the nameserver with the MX records for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) MX(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
-		s := time.Now()
-		result, err := p.resolver.LookupMX(ctx, hosts[i])
-		if err != nil {
-			return err
-		}
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupMX(deadline, host)
+			if err != nil {
+				return err
+			}
 
-		err = p.ResultsPrinter(hosts[i], queryTypeMXStr, time.Since(s), result)
-		if err != nil {
-			return err
-		}
+			err = p.ResultsPrinter(host, queryTypeMXStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	}
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypeMXStr, time.Since(batch))
+	}
+
 	return nil
 }
 
 // TXT preloads the nameserver with the TXT records for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) TXT(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
-		s := time.Now()
-		result, err := p.resolver.LookupTXT(ctx, hosts[i])
-		if err != nil {
-			return err
-		}
-		err = p.ResultsPrinter(hosts[i], queryTypeTXTStr, time.Since(s), result)
-		if err != nil {
-			return err
-		}
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupTXT(deadline, host)
+			if err != nil {
+				return err
+			}
+			err = p.ResultsPrinter(host, queryTypeTXTStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	}
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypeTXTStr, time.Since(batch))
+	}
+
 	return nil
 }
 
 // PTR preloads the nameserver with the PTR records for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) PTR(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
-		s := time.Now()
-		result, err := p.resolver.LookupAddr(ctx, hosts[i])
-		if err != nil {
-			return err
-		}
-		err = p.ResultsPrinter(hosts[i], queryTypePTRStr, time.Since(s), result)
-		if err != nil {
-			return err
-		}
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupAddr(deadline, host)
+			if err != nil {
+				return err
+			}
+			err = p.ResultsPrinter(host, queryTypePTRStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
 	}
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypePTRStr, time.Since(batch))
+	}
+
 	return nil
 }
 
@@ -276,7 +388,7 @@ func (p *Preload) ResultsPrinter(hostname string, qtype string, duration time.Du
 // IntroPrinter outputs the info on what domains and servers are being reloaded.
 func (p *Preload) IntroPrinter(queryType string, hosts []string) {
 	if !p.Mute {
-		fmt.Printf(infoMessage+"\n", p.nameserver, queryType, strings.Join(hosts, ", "))
+		fmt.Printf("\n"+infoMessage, p.nameserver, queryType, strings.Join(hosts, ", "))
 	}
 }
 
@@ -285,6 +397,19 @@ func completedPrinter(quiet bool, t time.Time) {
 	if !quiet {
 		fmt.Printf(completedMessage+"\n", time.Since(t))
 	}
+}
+
+// createErrGroup handles the logic to setup an errgroup for concurrency.
+func createErrGroup(limit uint8) *errgroup.Group {
+	g := new(errgroup.Group)
+	// if limit is not set, i.e. in testing set it.
+	if limit < 1 {
+		g.SetLimit(1)
+		return g
+	}
+	g.SetLimit(int(limit))
+
+	return g
 }
 
 func main() {
