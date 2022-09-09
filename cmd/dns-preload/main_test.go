@@ -60,6 +60,7 @@ func TestPreloadHosts(t *testing.T) {
 			fields: fields{
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -119,6 +120,7 @@ func TestPreloadPtr(t *testing.T) {
 			fields: fields{
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -132,6 +134,7 @@ func TestPreloadPtr(t *testing.T) {
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Quiet:      false,
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -193,6 +196,7 @@ func TestPreloadMX(t *testing.T) {
 				Full:       false,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -207,6 +211,7 @@ func TestPreloadMX(t *testing.T) {
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx: ctx,
@@ -220,6 +225,7 @@ func TestPreloadMX(t *testing.T) {
 			fields: fields{
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -281,6 +287,7 @@ func TestPreloadTXT(t *testing.T) {
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -293,6 +300,7 @@ func TestPreloadTXT(t *testing.T) {
 			fields: fields{
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -354,6 +362,7 @@ func TestPreloadNS(t *testing.T) {
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -366,6 +375,7 @@ func TestPreloadNS(t *testing.T) {
 			fields: fields{
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -427,6 +437,7 @@ func TestPreloadCNAME(t *testing.T) {
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -439,6 +450,7 @@ func TestPreloadCNAME(t *testing.T) {
 			fields: fields{
 				resolver:   dns.NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
@@ -497,6 +509,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				cmd: "cname",
@@ -510,6 +523,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				cmd: "hosts",
@@ -523,6 +537,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				cmd: "txt",
@@ -536,6 +551,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				cmd: "mx",
@@ -549,6 +565,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Server:     testDNSServer,
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
+				Workers:    1,
 			},
 			args: args{
 				cmd: "ns",
@@ -563,6 +580,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Debug:      true,
+				Workers:    1,
 			},
 			args: args{
 				cmd: "foo",
@@ -577,6 +595,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Debug:      true,
+				Workers:    1,
 			},
 			args: args{
 				cmd: "cname",
@@ -591,6 +610,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Debug:      true,
+				Workers:    1,
 			},
 			args: args{
 				cmd: "ptr",
@@ -605,6 +625,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Port:       testDNSServerPort,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Debug:      true,
+				Workers:    1,
 			},
 			args: args{
 				cmd: "ptr",
@@ -783,6 +804,7 @@ func TestPreloadRun(t *testing.T) {
 			name: "generate an error with good config",
 			fields: fields{
 				ConfigFile: "../../pkg/confighandlers/test_data/complete_config_sample.yaml",
+				Workers:    1,
 			},
 			args: args{
 				cmd: "does not exist",
@@ -793,6 +815,7 @@ func TestPreloadRun(t *testing.T) {
 			name: "generate an error with bad config",
 			fields: fields{
 				ConfigFile: "../../pkg/confighandlers/test_data/bad_configuration_sample.yaml",
+				Workers:    1,
 			},
 			args: args{
 				cmd: "does not exist",
