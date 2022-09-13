@@ -40,6 +40,7 @@ query_type:
     ns: []
     mx: []
     txt: []
+    ptr: []
 
 ```
 To write this to a file append `> config.yaml` e.g. `./dns-preload config > config.yaml`
@@ -83,6 +84,7 @@ Commands:
   mx        preload only the mx entries from the configuration file
   ns        preload only the ns entries from the configuration file
   txt       preload only the txt entries from the configuration file
+  ptr       preload only the ptr entries from the configuration file
   config    generate an empty configuration file to stdout
 
 Run "dns-preload <command> --help" for more information on a command.
