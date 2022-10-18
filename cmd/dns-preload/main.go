@@ -41,6 +41,7 @@ var (
 		Ptr    Preload       `cmd:"" help:"preload only the ptr entries from the configuration file"`
 		Config Config        `cmd:"" help:"generate an empty configuration file to stdout"`
 		Delay  time.Duration `default:"0s" help:"How long to wait until the queries are executed"`
+		Sleep  time.Duration `default:"100ms" help:"Sleep between the different tests when query type all has been chosen"`
 	}
 	start time.Time
 	quiet bool
@@ -139,6 +140,40 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 	return nil
 }
 
+// CNAME preload the nameserver with CNAME lookups for a given list of hostnames.
+//
+//nolint:dupl // duplication of logic but not functionality
+func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
+	batch := time.Now()
+	g := createErrGroup(p.Workers)
+	for i := 0; i < len(hosts); i++ {
+		host := hosts[i]
+		g.Go(func() error {
+			s := time.Now()
+			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
+			defer cancel()
+			result, err := p.resolver.LookupCNAME(deadline, host)
+			if err != nil {
+				return err
+			}
+			err = p.ResultsPrinter(host, queryTypeCNAMEStr, time.Since(s), result)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+	}
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	if !p.Quiet {
+		fmt.Printf(batchMessage, queryTypeCNAMEStr, time.Since(batch))
+	}
+
+	return nil
+}
+
 // Hosts preload the nameserver with IP addresses for a given list of hostnames.
 //
 //nolint:dupl // duplication of logic but not functionality
@@ -174,10 +209,10 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 	return nil
 }
 
-// CNAME preload the nameserver with CNAME lookups for a given list of hostnames.
+// MX preloads the nameserver with the MX records for a given list of hostnames.
 //
 //nolint:dupl // duplication of logic but not functionality
-func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
+func (p *Preload) MX(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
@@ -186,11 +221,12 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 			s := time.Now()
 			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
 			defer cancel()
-			result, err := p.resolver.LookupCNAME(deadline, host)
+			result, err := p.resolver.LookupMX(deadline, host)
 			if err != nil {
 				return err
 			}
-			err = p.ResultsPrinter(host, queryTypeCNAMEStr, time.Since(s), result)
+
+			err = p.ResultsPrinter(host, queryTypeMXStr, time.Since(s), result)
 			if err != nil {
 				return err
 			}
@@ -202,7 +238,7 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeCNAMEStr, time.Since(batch))
+		fmt.Printf(batchMessage, queryTypeMXStr, time.Since(batch))
 	}
 
 	return nil
@@ -237,41 +273,6 @@ func (p *Preload) NS(ctx context.Context, hosts []string) error {
 
 	if !p.Quiet {
 		fmt.Printf(batchMessage, queryTypeNSStr, time.Since(batch))
-	}
-
-	return nil
-}
-
-// MX preloads the nameserver with the MX records for a given list of hostnames.
-//
-//nolint:dupl // duplication of logic but not functionality
-func (p *Preload) MX(ctx context.Context, hosts []string) error {
-	batch := time.Now()
-	g := createErrGroup(p.Workers)
-	for i := 0; i < len(hosts); i++ {
-		host := hosts[i]
-		g.Go(func() error {
-			s := time.Now()
-			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
-			defer cancel()
-			result, err := p.resolver.LookupMX(deadline, host)
-			if err != nil {
-				return err
-			}
-
-			err = p.ResultsPrinter(host, queryTypeMXStr, time.Since(s), result)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
-	if err := g.Wait(); err != nil {
-		return err
-	}
-
-	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeMXStr, time.Since(batch))
 	}
 
 	return nil
@@ -432,6 +433,8 @@ func main() {
 			if err != nil {
 				e = append(e, fmt.Errorf("quertyType: %s, err: %s", queryType, err))
 			}
+			// add a small sleep so that the queries can complete before the next batch.
+			time.Sleep(cli.Sleep)
 		}
 		completedPrinter(quiet, start)
 
