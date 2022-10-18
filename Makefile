@@ -55,7 +55,7 @@ deps:
 	@echo ""
 	@echo "***** Installing dependencies for ${TOOL} *****"
 	go clean --cache
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.50.0
 
 dns-preload:
 	@echo ""
