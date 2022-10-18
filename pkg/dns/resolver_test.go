@@ -2,13 +2,115 @@ package dns
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"reflect"
 	"testing"
 	"time"
 )
 
-var abc123 testing.T
+// NewMockResolver returns the mock resolver.
+func NewMockResolver() *Mockresolver {
+	return &Mockresolver{}
+}
+
+// Mock the above resolver interface
+type Mockresolver struct{}
+
+func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, error) {
+	switch host {
+	case "www.foo.bar":
+		return testDomainNoErr, nil
+	case "www.bar.foo":
+		return "", fmt.Errorf(nxDomainErr, host)
+	}
+	return "", fmt.Errorf(nxDomainErr, host)
+}
+
+func (m *Mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
+	if addr != googleIpv6 {
+		return []string{}, fmt.Errorf("%s ptr not found", addr)
+	}
+	return []string{"ipv6.google.com"}, nil
+}
+
+func (m *Mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
+	switch host {
+	case testDomainNoErr, testDomainMX0, testDomainNS1:
+		ip1 := net.ParseIP(googlePubDNS1)
+		return []net.IPAddr{
+			{
+				IP: ip1,
+			},
+		}, nil
+	case "ns2.foo.bar":
+		ip2 := net.ParseIP(googlePubDNS2)
+		return []net.IPAddr{
+			{
+				IP: ip2,
+			},
+		}, nil
+	case "dns.oranged.to":
+		ip1 := net.ParseIP(googlePubDNS1)
+		ip2 := net.ParseIP(googlePubDNS2)
+		return []net.IPAddr{
+			{
+				IP: ip1,
+			},
+			{
+				IP: ip2,
+			},
+		}, nil
+	case testDomainWithErr:
+		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
+	}
+	return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
+}
+
+//nolint:gocritic // uses switch to expand on test cases in the future.
+func (m *Mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, error) {
+	switch host {
+	case testDomainNoErr:
+		return []*net.MX{
+			{
+				Host: testDomainMX0,
+				Pref: 10,
+			},
+			{
+				Host: testDomainMX1,
+				Pref: 10,
+			},
+		}, nil
+	}
+	return []*net.MX{}, fmt.Errorf(nxDomainErr, host)
+}
+
+//nolint:gocritic // uses switch to expand on test cases in the future.
+func (m *Mockresolver) LookupTXT(ctx context.Context, host string) ([]string, error) {
+	switch host {
+	case testDomainNoErr:
+		return []string{
+			"v=spf1 -all",
+		}, nil
+	}
+	return []string{}, fmt.Errorf(nxDomainErr, host)
+}
+
+//nolint:gocritic // uses switch to expand on test cases in the future.
+func (m *Mockresolver) LookupNS(ctx context.Context, host string) ([]*net.NS, error) {
+	switch host {
+	case testDomainNoErr:
+		return []*net.NS{
+			{
+				Host: "ns1.foo.bar",
+			},
+			{
+				Host: "ns2.foo.bar",
+			},
+		}, nil
+	}
+	return []*net.NS{}, fmt.Errorf(nxDomainErr, host)
+}
 
 func TestResolverLookupAll(t *testing.T) {
 	type args struct {
@@ -51,7 +153,7 @@ func TestResolverLookupAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &mockresolver{}
+			m := &Mockresolver{}
 			cname, err := m.LookupCNAME(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mockresolver.LookupCNAME() error = %v, wantErr %v", err, tt.wantErr)
@@ -71,7 +173,7 @@ func TestMockresolverLookupAddr(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		m       *mockresolver
+		m       *Mockresolver
 		args    args
 		want    []string
 		wantErr bool
@@ -97,7 +199,7 @@ func TestMockresolverLookupAddr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &mockresolver{}
+			m := &Mockresolver{}
 			got, err := m.LookupAddr(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mockresolver.LookupAddr() error = %v, wantErr %v", err, tt.wantErr)
@@ -117,7 +219,7 @@ func TestMockresolverLookupIPAddr(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		m       *mockresolver
+		m       *Mockresolver
 		args    args
 		want    []net.IPAddr
 		wantErr bool
@@ -130,7 +232,7 @@ func TestMockresolverLookupIPAddr(t *testing.T) {
 			},
 			want: []net.IPAddr{
 				{
-					IP: net.ParseIP(googlePubDns1),
+					IP: net.ParseIP(googlePubDNS1),
 				},
 			},
 			wantErr: false,
@@ -143,7 +245,7 @@ func TestMockresolverLookupIPAddr(t *testing.T) {
 			},
 			want: []net.IPAddr{
 				{
-					IP: net.ParseIP(googlePubDns2),
+					IP: net.ParseIP(googlePubDNS2),
 				},
 			},
 			wantErr: false,
@@ -169,7 +271,7 @@ func TestMockresolverLookupIPAddr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &mockresolver{}
+			m := &Mockresolver{}
 			got, err := m.LookupIPAddr(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mockresolver.LookupIPAddr() error = %v, wantErr %v", err, tt.wantErr)
@@ -189,7 +291,7 @@ func TestMockresolverLookupMX(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		m       *mockresolver
+		m       *Mockresolver
 		args    args
 		want    []*net.MX
 		wantErr bool
@@ -233,7 +335,7 @@ func TestMockresolverLookupMX(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &mockresolver{}
+			m := &Mockresolver{}
 			got, err := m.LookupMX(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mockresolver.LookupMX() error = %v, wantErr %v", err, tt.wantErr)
@@ -253,7 +355,7 @@ func TestMockresolverLookupTXT(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		m       *mockresolver
+		m       *Mockresolver
 		args    args
 		want    []string
 		wantErr bool
@@ -290,7 +392,7 @@ func TestMockresolverLookupTXT(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := &mockresolver{}
+			m := &Mockresolver{}
 			got, err := m.LookupTXT(tt.args.ctx, tt.args.host)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("mockresolver.LookupTXT() error = %v, wantErr %v", err, tt.wantErr)
@@ -310,7 +412,7 @@ func TestMockresolverLookupNS(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		m       *mockresolver
+		m       *Mockresolver
 		args    args
 		want    []*net.NS
 		wantErr bool
@@ -356,8 +458,9 @@ func TestMockresolverLookupNS(t *testing.T) {
 	}
 }
 
+//nolint:errcheck,gocritic // errcheck here is just cycling through various tests
 func TestNewResolver(t *testing.T) {
-	var testDomain string = "google.com"
+	var testDomain = "google.com"
 	type args struct {
 		nameserver string
 		timeout    time.Duration
@@ -365,15 +468,15 @@ func TestNewResolver(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *resolver
+		want *Resolver
 	}{
 		{
 			name: "test",
 			args: args{
 				nameserver: "192.168.1.252:53",
-				timeout:    time.Duration(5 * time.Second),
+				timeout:    5 * time.Second,
 			},
-			want: &resolver{client: &net.Resolver{}},
+			want: &Resolver{client: &net.Resolver{}},
 		},
 	}
 	for _, tt := range tests {
@@ -388,52 +491,6 @@ func TestNewResolver(t *testing.T) {
 			resolver.LookupNS(context.Background(), testDomain)
 			resolver.LookupAddr(context.Background(), testPtrNoErr)
 			resolver.LookupCNAME(context.Background(), testDomain)
-		})
-	}
-}
-
-func TestWithResolver(t *testing.T) {
-	type args struct {
-		s          interface{}
-		nameserver string
-		timeout    time.Duration
-	}
-	tests := []struct {
-		name string
-		args args
-		want interface{}
-	}{
-		{
-			name: "Test net Resolver",
-			args: args{
-				s:          nil,
-				nameserver: "9.9.9.9:53",
-				timeout:    time.Duration(30 * time.Second),
-			},
-			want: resolver{},
-		},
-		{
-			name: "Test mock Resolver",
-			args: args{
-				s:          mockresolver{},
-				nameserver: "",
-				timeout:    time.Second,
-			},
-			want: resolver{},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			d := WithResolver(tt.args.s, tt.args.nameserver, tt.args.timeout)
-			res, err := d.LookupIPAddr(context.Background(), "dns.oranged.to")
-			if err != nil {
-				t.Errorf("expected dns results got error %s", err)
-			}
-			for _, r := range res {
-				if (r.IP.String() != googlePubDns1) && (r.IP.String() != googlePubDns2) {
-					t.Errorf("expected results %s or %s got %+v", googlePubDns1, googlePubDns2, res)
-				}
-			}
 		})
 	}
 }

@@ -30,7 +30,7 @@ func TestPreloadHosts(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *dns.Resolver
 		nameserver string
 	}
 	type args struct {
@@ -102,7 +102,7 @@ func TestPreloadPtr(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *dns.Resolver
 		nameserver string
 	}
 	type args struct {
