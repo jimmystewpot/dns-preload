@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"testing"
 	"time"
@@ -13,10 +14,119 @@ import (
 const (
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
-	testPtrNoErr      string = "2404:6800:4006:804::200e"
+	googlePubDNS1     string = "8.8.4.4"
+	googlePubDNS2     string = "8.8.8.8"
+	googleIpv6        string = "2404:6800:4006:804::200e"
 	testDNSServer     string = "9.9.9.9"
 	testDNSServerPort string = "53"
+	nxDomainErr       string = "nxdomain %s"
+	testDomainMX0     string = "mx0.foo.bar"
+	testDomainMX1     string = "mx1.foo.bar"
+	testDomainNS1     string = "ns1.foo.bar"
 )
+
+// NewMockResolver returns the mock resolver.
+func NewMockResolver() *Mockresolver {
+	return &Mockresolver{}
+}
+
+// Mock the above resolver interface
+type Mockresolver struct{}
+
+func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, error) {
+	switch host {
+	case "www.foo.bar":
+		return testDomainNoErr, nil
+	case "www.bar.foo":
+		return "", fmt.Errorf(nxDomainErr, host)
+	}
+	return "", fmt.Errorf(nxDomainErr, host)
+}
+
+func (m *Mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
+	switch host {
+	case testDomainNoErr, testDomainMX0, testDomainNS1:
+		ip1 := net.ParseIP(googlePubDNS1)
+		return []net.IPAddr{
+			{
+				IP: ip1,
+			},
+		}, nil
+	case "ns2.foo.bar":
+		ip2 := net.ParseIP(googlePubDNS2)
+		return []net.IPAddr{
+			{
+				IP: ip2,
+			},
+		}, nil
+	case "dns.oranged.to":
+		ip1 := net.ParseIP(googlePubDNS1)
+		ip2 := net.ParseIP(googlePubDNS2)
+		return []net.IPAddr{
+			{
+				IP: ip1,
+			},
+			{
+				IP: ip2,
+			},
+		}, nil
+	case testDomainWithErr:
+		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
+	}
+	return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
+}
+
+func (m *Mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
+	if addr != googleIpv6 {
+		return []string{}, fmt.Errorf("%s ptr not found", addr)
+	}
+	return []string{"ipv6.google.com"}, nil
+}
+
+//nolint:gocritic // uses switch to expand on test cases in the future.
+func (m *Mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, error) {
+	switch host {
+	case testDomainNoErr:
+		return []*net.MX{
+			{
+				Host: testDomainMX0,
+				Pref: 10,
+			},
+			{
+				Host: testDomainMX1,
+				Pref: 10,
+			},
+		}, nil
+	}
+	return []*net.MX{}, fmt.Errorf(nxDomainErr, host)
+}
+
+//nolint:gocritic // uses switch to expand on test cases in the future.
+func (m *Mockresolver) LookupTXT(ctx context.Context, host string) ([]string, error) {
+	switch host {
+	case testDomainNoErr:
+		return []string{
+			"v=spf1 -all",
+		}, nil
+	}
+	return []string{}, fmt.Errorf(nxDomainErr, host)
+}
+
+//nolint:gocritic // uses switch to expand on test cases in the future.
+func (m *Mockresolver) LookupNS(ctx context.Context, host string) ([]*net.NS, error) {
+	switch host {
+	case testDomainNoErr:
+		return []*net.NS{
+			{
+				Host: "ns1.foo.bar",
+			},
+			{
+				Host: "ns2.foo.bar",
+			},
+		}, nil
+	}
+	return []*net.NS{}, fmt.Errorf(nxDomainErr, host)
+}
 
 func TestPreloadHosts(t *testing.T) {
 	ctx := context.Background()
@@ -30,7 +140,7 @@ func TestPreloadHosts(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -46,7 +156,7 @@ func TestPreloadHosts(t *testing.T) {
 		{
 			name: "Test Case Without Error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 			},
 			args: args{
@@ -58,7 +168,7 @@ func TestPreloadHosts(t *testing.T) {
 		{
 			name: "Test Case With Error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Workers:    1,
 			},
@@ -102,7 +212,7 @@ func TestPreloadPtr(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -118,20 +228,20 @@ func TestPreloadPtr(t *testing.T) {
 		{
 			name: "Test Case Without Error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Workers:    1,
 			},
 			args: args{
 				ctx:   ctx,
-				hosts: []string{testPtrNoErr},
+				hosts: []string{googleIpv6},
 			},
 			wantErr: false,
 		},
 		{
 			name: "Test Case With Error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Quiet:      false,
 				Workers:    1,
@@ -176,7 +286,7 @@ func TestPreloadMX(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -192,7 +302,7 @@ func TestPreloadMX(t *testing.T) {
 		{
 			name: "IN MX",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				Full:       false,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
@@ -207,7 +317,7 @@ func TestPreloadMX(t *testing.T) {
 		{
 			name: "IN MX full recursion with error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
@@ -223,7 +333,7 @@ func TestPreloadMX(t *testing.T) {
 		{
 			name: "IN MX with Error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Workers:    1,
 			},
@@ -267,7 +377,7 @@ func TestPreloadTXT(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -283,7 +393,7 @@ func TestPreloadTXT(t *testing.T) {
 		{
 			name: "IN TXT",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
@@ -298,7 +408,7 @@ func TestPreloadTXT(t *testing.T) {
 		{
 			name: "IN TXT error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Workers:    1,
 			},
@@ -342,7 +452,7 @@ func TestPreloadNS(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -358,7 +468,7 @@ func TestPreloadNS(t *testing.T) {
 		{
 			name: "IN NS",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
@@ -373,7 +483,7 @@ func TestPreloadNS(t *testing.T) {
 		{
 			name: "IN NS error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Workers:    1,
 			},
@@ -417,7 +527,7 @@ func TestPreloadCNAME(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -433,7 +543,7 @@ func TestPreloadCNAME(t *testing.T) {
 		{
 			name: "IN CNAME",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				Full:       true,
 				Quiet:      false,
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
@@ -448,7 +558,7 @@ func TestPreloadCNAME(t *testing.T) {
 		{
 			name: "IN CNAME error",
 			fields: fields{
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: net.JoinHostPort(testDNSServer, testDNSServerPort),
 				Workers:    1,
 			},
@@ -644,7 +754,7 @@ func TestPreloadRunQueries(t *testing.T) {
 				Full:       tt.fields.Full,
 				Debug:      tt.fields.Debug,
 				Timeout:    tt.fields.Timeout,
-				resolver:   dns.NewMockResolver(),
+				resolver:   NewMockResolver(),
 				nameserver: tt.fields.nameserver,
 			}
 			cfg, _ := confighandlers.LoadConfigFromFile(&tt.fields.ConfigFile)
@@ -666,7 +776,7 @@ func TestPreloadPrinter(t *testing.T) {
 		Debug      bool
 		Timeout    time.Duration
 		Delay      time.Duration
-		resolver   dns.Resolver
+		resolver   *Mockresolver
 		nameserver string
 	}
 	type args struct {
@@ -712,11 +822,6 @@ func TestPreloadPrinter(t *testing.T) {
 			}
 		})
 	}
-}
-
-func returnIntInterface() interface{} {
-	x := []int{1, 2, 3, 4, 5}
-	return x
 }
 
 func TestConfigRun(t *testing.T) {
@@ -788,7 +893,7 @@ func TestPreloadRun(t *testing.T) {
 		Full       bool
 		Debug      bool
 		Timeout    time.Duration
-		resolver   dns.Resolver
+		resolver   *dns.Resolver
 		nameserver string
 	}
 	type args struct {
@@ -878,4 +983,9 @@ func Test_completedPrinter(t *testing.T) {
 			completedPrinter(tt.args.quiet, tt.args.t)
 		})
 	}
+}
+
+func returnIntInterface() interface{} {
+	x := []int{1, 2, 3, 4, 5}
+	return x
 }

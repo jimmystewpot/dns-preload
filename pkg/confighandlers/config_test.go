@@ -21,7 +21,10 @@ func TestConfigurationPrintEmptyConfigration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &Configuration{}
-			cfg.PrintEmptyConfigration(tt.quiet)
+			err := cfg.PrintEmptyConfigration(tt.quiet)
+			if err != nil {
+				t.Errorf("error in PrintEmptyconfiguration %s", err)
+			}
 		})
 	}
 }

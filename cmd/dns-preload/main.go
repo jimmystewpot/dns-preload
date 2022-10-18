@@ -23,8 +23,8 @@ const (
 	queryTypeTXTStr   string = "TXT"
 	queryTypePTRStr   string = "PTR"
 	// print messages that are used more than once.
-	infoMessage          string = "Preloading Nameserver: %s with query type: %s for domains: %s\n"
-	batchMessage         string = "Preloaded batch for query type: %s completed in: %s\n"
+	infoMessage          string = "Preloading Nameserver: %s with query type: %s for domains: %s"
+	batchMessage         string = "Preloaded batch for query type: %s completed in: %s"
 	qTypeEmptyErrMessage string = "Preloading error: query type %s has no entries in the configuration"
 	qTypeErrMessage      string = "preloading error: query type %s is not a valid query type"
 	completedMessage     string = "Preload completed in %s"
@@ -57,7 +57,7 @@ type Preload struct {
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Debug      bool          `default:"false" help:"Debug mode"`
 	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed (not implemented)"`
-	resolver   dns.Resolver
+	resolver   dns.CustomResolver
 	nameserver string
 }
 
@@ -168,7 +168,7 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeCNAMEStr, time.Since(batch))
+		fmt.Printf(batchMessage+"\n", queryTypeCNAMEStr, time.Since(batch))
 	}
 
 	return nil
@@ -203,7 +203,7 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeAStr, time.Since(batch))
+		fmt.Printf(batchMessage+"\n", queryTypeAStr, time.Since(batch))
 	}
 
 	return nil
@@ -238,15 +238,13 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeMXStr, time.Since(batch))
+		fmt.Printf(batchMessage+"\n", queryTypeMXStr, time.Since(batch))
 	}
 
 	return nil
 }
 
 // NS preloads the nameserver records for a given list of hostnames.
-//
-//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) NS(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g := createErrGroup(p.Workers)
@@ -262,6 +260,8 @@ func (p *Preload) NS(ctx context.Context, hosts []string) error {
 			}
 			err = p.ResultsPrinter(host, queryTypeNSStr, time.Since(s), result)
 			if err != nil {
+				completedPrinter(quiet, start)
+
 				return err
 			}
 			return nil
@@ -272,7 +272,7 @@ func (p *Preload) NS(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeNSStr, time.Since(batch))
+		fmt.Printf(batchMessage+"\n", queryTypeNSStr, time.Since(batch))
 	}
 
 	return nil
@@ -306,7 +306,7 @@ func (p *Preload) TXT(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypeTXTStr, time.Since(batch))
+		fmt.Printf(batchMessage+"\n", queryTypeTXTStr, time.Since(batch))
 	}
 
 	return nil
@@ -340,7 +340,7 @@ func (p *Preload) PTR(ctx context.Context, hosts []string) error {
 	}
 
 	if !p.Quiet {
-		fmt.Printf(batchMessage, queryTypePTRStr, time.Since(batch))
+		fmt.Printf(batchMessage+"\n", queryTypePTRStr, time.Since(batch))
 	}
 
 	return nil
@@ -389,7 +389,7 @@ func (p *Preload) ResultsPrinter(hostname string, qtype string, duration time.Du
 // IntroPrinter outputs the info on what domains and servers are being reloaded.
 func (p *Preload) IntroPrinter(queryType string, hosts []string) {
 	if !p.Mute {
-		fmt.Printf("\n"+infoMessage, p.nameserver, queryType, strings.Join(hosts, ", "))
+		fmt.Printf("\n"+infoMessage, p.nameserver, queryType, strings.Join(hosts, ", ")+"\n")
 	}
 }
 
@@ -427,23 +427,25 @@ func main() {
 	time.Sleep(cli.Delay)
 	switch cmd.Command() {
 	case "all":
-		e := make([]error, 0)
+		errGrp := createErrGroup(1)
 		for _, queryType := range confighandlers.QueryTypes {
-			err := cmd.Run(queryType)
-			if err != nil {
-				e = append(e, fmt.Errorf("quertyType: %s, err: %s", queryType, err))
-			}
+			errGrp.Go(func() error {
+				err := cmd.Run(queryType)
+				if err != nil {
+					if !quiet {
+						fmt.Printf("%s\n", err)
+					}
+					return err
+				}
+				return nil
+			})
 			// add a small sleep so that the queries can complete before the next batch.
 			time.Sleep(cli.Sleep)
 		}
-		completedPrinter(quiet, start)
 
-		if len(e) != 0 {
-			var errLog error
-			for _, errLog = range e {
-				fmt.Printf("%s ", errLog)
-			}
-			cmd.FatalIfErrorf(errLog)
+		completedPrinter(quiet, start)
+		if err := errGrp.Wait(); err != nil {
+			cmd.FatalIfErrorf(err)
 		}
 	default:
 		err := cmd.Run(cmd.Command())
