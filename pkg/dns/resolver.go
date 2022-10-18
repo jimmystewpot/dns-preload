@@ -6,19 +6,6 @@ import (
 	"time"
 )
 
-const (
-	googlePubDNS1     string = "8.8.4.4"
-	googlePubDNS2     string = "8.8.8.8"
-	googleIpv6        string = "2404:6800:4006:804::200e"
-	testDomainNoErr   string = "foo.bar"
-	testDomainWithErr string = "bar.foo"
-	testDomainMX0     string = "mx0.foo.bar"
-	testDomainMX1     string = "mx1.foo.bar"
-	testDomainNS1     string = "ns1.foo.bar"
-	testPtrNoErr      string = "2404:6800:4006:804::200e"
-	nxDomainErr       string = "nxdomain %s"
-)
-
 type CustomResolver interface {
 	LookupCNAME(ctx context.Context, host string) (string, error)
 	LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error)

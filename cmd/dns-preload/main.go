@@ -57,7 +57,7 @@ type Preload struct {
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Debug      bool          `default:"false" help:"Debug mode"`
 	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed (not implemented)"`
-	resolver   *dns.Resolver
+	resolver   dns.CustomResolver
 	nameserver string
 }
 

@@ -9,6 +9,19 @@ import (
 	"time"
 )
 
+const (
+	googlePubDNS1     string = "8.8.4.4"
+	googlePubDNS2     string = "8.8.8.8"
+	googleIpv6        string = "2404:6800:4006:804::200e"
+	testDomainNoErr   string = "foo.bar"
+	testDomainWithErr string = "bar.foo"
+	testDomainMX0     string = "mx0.foo.bar"
+	testDomainMX1     string = "mx1.foo.bar"
+	testDomainNS1     string = "ns1.foo.bar"
+	testPtrNoErr      string = "2404:6800:4006:804::200e"
+	nxDomainErr       string = "nxdomain %s"
+)
+
 // NewMockResolver returns the mock resolver.
 func NewMockResolver() *Mockresolver {
 	return &Mockresolver{}
@@ -25,13 +38,6 @@ func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 		return "", fmt.Errorf(nxDomainErr, host)
 	}
 	return "", fmt.Errorf(nxDomainErr, host)
-}
-
-func (m *Mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
-	if addr != googleIpv6 {
-		return []string{}, fmt.Errorf("%s ptr not found", addr)
-	}
-	return []string{"ipv6.google.com"}, nil
 }
 
 func (m *Mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
@@ -65,6 +71,13 @@ func (m *Mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 		return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
 	}
 	return []net.IPAddr{}, fmt.Errorf(nxDomainErr, host)
+}
+
+func (m *Mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
+	if addr != googleIpv6 {
+		return []string{}, fmt.Errorf("%s ptr not found", addr)
+	}
+	return []string{"ipv6.google.com"}, nil
 }
 
 //nolint:gocritic // uses switch to expand on test cases in the future.
