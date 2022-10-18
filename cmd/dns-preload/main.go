@@ -204,7 +204,6 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 
 	if !p.Quiet {
 		fmt.Printf(batchMessage+"\n", queryTypeAStr, time.Since(batch))
-
 	}
 
 	return nil
@@ -240,15 +239,12 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 
 	if !p.Quiet {
 		fmt.Printf(batchMessage+"\n", queryTypeMXStr, time.Since(batch))
-
 	}
 
 	return nil
 }
 
 // NS preloads the nameserver records for a given list of hostnames.
-//
-//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) NS(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g := createErrGroup(p.Workers)
