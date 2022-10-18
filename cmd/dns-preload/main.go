@@ -204,6 +204,7 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 
 	if !p.Quiet {
 		fmt.Printf(batchMessage+"\n", queryTypeAStr, time.Since(batch))
+
 	}
 
 	return nil
@@ -213,7 +214,7 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 //
 //nolint:dupl // duplication of logic but not functionality
 func (p *Preload) MX(ctx context.Context, hosts []string) error {
-	batch := time.Now()
+	batch := time.Now() cmd/dns-preload/main.go 
 	g := createErrGroup(p.Workers)
 	for i := 0; i < len(hosts); i++ {
 		host := hosts[i]
@@ -239,6 +240,7 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 
 	if !p.Quiet {
 		fmt.Printf(batchMessage+"\n", queryTypeMXStr, time.Since(batch))
+
 	}
 
 	return nil
@@ -246,6 +248,7 @@ func (p *Preload) MX(ctx context.Context, hosts []string) error {
 
 // NS preloads the nameserver records for a given list of hostnames.
 //
+//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) NS(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g := createErrGroup(p.Workers)
