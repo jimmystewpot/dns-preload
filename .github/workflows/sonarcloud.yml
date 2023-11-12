@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+  schedule:
+    - cron: "1 1 2 * *"
 
 permissions:
   pull-requests: read # allows SonarCloud to decorate PRs with analysis results

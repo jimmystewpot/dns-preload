@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// CustomResolver Interface can be reimplemented very easily for mocking
 type CustomResolver interface {
 	LookupCNAME(ctx context.Context, host string) (string, error)
 	LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error)
