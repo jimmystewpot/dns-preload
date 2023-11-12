@@ -38,6 +38,8 @@ endif
 # build the software
 #
 build: get-golang
+	@echo ""
+	@echo "***** Building ${TOOL} *****"
 	@docker run \
 		--rm \
 		-v $(CURDIR):/build/$(GO_DIR) \
@@ -60,7 +62,9 @@ deps:
 dns-preload:
 	@echo ""
 	@echo "***** Building ${TOOL} *****"
-	go build -race -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
+	git config --global --add safe.directory /build/src/github.com/jimmystewpot/dns-preload
+	git status
+	go build -race -trimpath -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
 linux-arm64:
@@ -84,7 +88,7 @@ linux-arm32:
 test:
 	@echo ""
 	@echo "***** Testing ${TOOL} *****"
-	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json ./... 1> reports/testreport.json
+	go test -a -v -race -coverprofile=reports/coverage.txt -covermode=atomic -json $(TEST_DIRS) 1> reports/testreport.json
 	@echo ""
 
 
