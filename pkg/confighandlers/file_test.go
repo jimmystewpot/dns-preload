@@ -1,6 +1,7 @@
 package confighandlers
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -63,10 +64,19 @@ func TestLoadConfigFromFile(t *testing.T) {
 			want:    &QueryType{},
 			wantErr: true,
 		},
+		{
+			name: "missing configuration keys",
+			args: args{
+				cfgfile: ptr("test_data/missing_config_keys.yaml"),
+			},
+			want:    &QueryType{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := LoadConfigFromFile(tt.args.cfgfile)
+			fmt.Printf("%+v\n", got)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoadConfigFromFile() error = %v, wantErr %v", err, tt.wantErr)
 				return

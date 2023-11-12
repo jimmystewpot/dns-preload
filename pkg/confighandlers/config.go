@@ -21,28 +21,28 @@ var (
 )
 
 type Configuration struct {
-	QueryType QueryType `yaml:"query_type" json:"query_type"`
+	QueryType QueryType `yaml:"query_type" json:"query_type" validate:"required"`
 }
 
 // QueryType lsits out the structure for the different domains and their query type
 type QueryType struct {
 	// Cnames for doing a cname lookup
-	Cname      []string `yaml:"cname" json:"cname"`
+	Cname      []string `yaml:"cname" json:"cname" validate:"dive,fqdn"`
 	CnameCount uint16   `yaml:",omitempty"`
 	// Hosts for doing a query for type A and AAAA
-	Hosts      []string `yaml:"hosts" json:"hosts"`
+	Hosts      []string `yaml:"hosts" json:"hosts" validate:"dive,fqdn"`
 	HostsCount uint16   `yaml:",omitempty"`
 	// ns for doing a query for type NS
-	NS      []string `yaml:"ns" json:"ns"`
+	NS      []string `yaml:"ns" json:"ns" validate:"dive,fqdn"`
 	NSCount uint16   `yaml:",omitempty"`
 	// MX for doing a query for type MX
-	MX      []string `yaml:"mx" json:"mx"`
+	MX      []string `yaml:"mx" json:"mx" validate:"dive,fqdn"`
 	MXCount uint16   `yaml:",omitempty"`
 	// TXT for doing a query for type TXT
-	TXT      []string `yaml:"txt" json:"txt"`
+	TXT      []string `yaml:"txt" json:"txt" validate:"dive,fqdn"`
 	TXTCount uint16   `yaml:",omitempty"`
 	// PTR for doing a query for type PTR
-	PTR      []string `yaml:"ptr" json:"ptr"`
+	PTR      []string `yaml:"ptr" json:"ptr" validate:"dive,ip_addr"`
 	PTRCount uint16   `yaml:",omitempty"`
 }
 

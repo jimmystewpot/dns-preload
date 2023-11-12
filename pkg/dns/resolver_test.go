@@ -31,6 +31,7 @@ func NewMockResolver() *Mockresolver {
 type Mockresolver struct{}
 
 func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, error) {
+	defer ctx.Done()
 	switch host {
 	case "www.foo.bar":
 		return testDomainNoErr, nil
@@ -41,6 +42,7 @@ func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, er
 }
 
 func (m *Mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPAddr, error) {
+	defer ctx.Done()
 	switch host {
 	case testDomainNoErr, testDomainMX0, testDomainNS1:
 		ip1 := net.ParseIP(googlePubDNS1)
@@ -74,6 +76,7 @@ func (m *Mockresolver) LookupIPAddr(ctx context.Context, host string) ([]net.IPA
 }
 
 func (m *Mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, error) {
+	defer ctx.Done()
 	if addr != googleIpv6 {
 		return []string{}, fmt.Errorf("%s ptr not found", addr)
 	}
@@ -82,6 +85,7 @@ func (m *Mockresolver) LookupAddr(ctx context.Context, addr string) ([]string, e
 
 //nolint:gocritic // uses switch to expand on test cases in the future.
 func (m *Mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, error) {
+	defer ctx.Done()
 	switch host {
 	case testDomainNoErr:
 		return []*net.MX{
@@ -100,6 +104,7 @@ func (m *Mockresolver) LookupMX(ctx context.Context, host string) ([]*net.MX, er
 
 //nolint:gocritic // uses switch to expand on test cases in the future.
 func (m *Mockresolver) LookupTXT(ctx context.Context, host string) ([]string, error) {
+	defer ctx.Done()
 	switch host {
 	case testDomainNoErr:
 		return []string{
@@ -111,6 +116,7 @@ func (m *Mockresolver) LookupTXT(ctx context.Context, host string) ([]string, er
 
 //nolint:gocritic // uses switch to expand on test cases in the future.
 func (m *Mockresolver) LookupNS(ctx context.Context, host string) ([]*net.NS, error) {
+	defer ctx.Done()
 	switch host {
 	case testDomainNoErr:
 		return []*net.NS{
