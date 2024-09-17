@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	Mx    string = "mx"
-	Ns    string = "ns"
-	Txt   string = "txt"
-	Cname string = "cname"
-	Hosts string = "hosts"
-	Ptr   string = "ptr"
+	Mx         string = "mx"
+	Ns         string = "ns"
+	Txt        string = "txt"
+	Cname      string = "cname"
+	Hosts      string = "hosts"
+	Ptr        string = "ptr"
+	nilRecords uint16 = 0
 )
 
 var (
@@ -27,23 +28,23 @@ type Configuration struct {
 // QueryType lsits out the structure for the different domains and their query type
 type QueryType struct {
 	// Cnames for doing a cname lookup
-	Cname      []string `yaml:"cname" json:"cname" validate:"dive,fqdn"`
-	CnameCount uint16   `yaml:",omitempty"`
+	Cname []string `yaml:"cname" json:"cname" validate:"dive,fqdn"`
 	// Hosts for doing a query for type A and AAAA
-	Hosts      []string `yaml:"hosts" json:"hosts" validate:"dive,fqdn"`
-	HostsCount uint16   `yaml:",omitempty"`
+	Hosts []string `yaml:"hosts" json:"hosts" validate:"dive,fqdn"`
 	// ns for doing a query for type NS
-	NS      []string `yaml:"ns" json:"ns" validate:"dive,fqdn"`
-	NSCount uint16   `yaml:",omitempty"`
+	NS []string `yaml:"ns" json:"ns" validate:"dive,fqdn"`
 	// MX for doing a query for type MX
-	MX      []string `yaml:"mx" json:"mx" validate:"dive,fqdn"`
-	MXCount uint16   `yaml:",omitempty"`
+	MX []string `yaml:"mx" json:"mx" validate:"dive,fqdn"`
 	// TXT for doing a query for type TXT
-	TXT      []string `yaml:"txt" json:"txt" validate:"dive,fqdn"`
-	TXTCount uint16   `yaml:",omitempty"`
+	TXT []string `yaml:"txt" json:"txt" validate:"dive,fqdn"`
 	// PTR for doing a query for type PTR
-	PTR      []string `yaml:"ptr" json:"ptr" validate:"dive,ip_addr"`
-	PTRCount uint16   `yaml:",omitempty"`
+	PTR        []string `yaml:"ptr" json:"ptr" validate:"dive,ip_addr"`
+	CnameCount uint16   `yaml:",omitempty"`
+	HostsCount uint16   `yaml:",omitempty"`
+	NSCount    uint16   `yaml:",omitempty"`
+	MXCount    uint16   `yaml:",omitempty"`
+	TXTCount   uint16   `yaml:",omitempty"`
+	PTRCount   uint16   `yaml:",omitempty"`
 }
 
 // PopulateCounts for how many domains are in each query_type.

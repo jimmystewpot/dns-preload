@@ -50,7 +50,7 @@ func LoadConfigFromFile(cfgfile *string) (*Configuration, error) {
 	if err != nil {
 		return &Configuration{}, err
 	}
-	if (cfg.QueryType.CnameCount == 0) && (cfg.QueryType.HostsCount == 0) && (cfg.QueryType.MXCount == 0) && (cfg.QueryType.PTRCount == 00) && (cfg.QueryType.TXTCount == 0) {
+	if (cfg.QueryType.CnameCount == nilRecords) && (cfg.QueryType.HostsCount == nilRecords) && (cfg.QueryType.MXCount == nilRecords) && (cfg.QueryType.PTRCount == nilRecords) && (cfg.QueryType.TXTCount == nilRecords) {
 		return &Configuration{}, fmt.Errorf("empty configuration or invalid keys")
 	}
 

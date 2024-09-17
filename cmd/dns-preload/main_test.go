@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
@@ -956,7 +957,7 @@ func TestPreloadRun(t *testing.T) {
 	}
 }
 
-func Test_completedPrinter(t *testing.T) {
+func TestCompletedPrinter(t *testing.T) {
 	start := time.Now()
 	type args struct {
 		quiet bool
@@ -981,12 +982,22 @@ func Test_completedPrinter(t *testing.T) {
 				quiet: false,
 				t:     start,
 			},
-			want: "",
+			want: completedMessage,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			completedPrinter(tt.args.quiet, tt.args.t)
+			s := completedPrinter(tt.args.quiet, tt.args.t)
+			if tt.args.quiet {
+				if s != tt.want {
+					t.Errorf("expected nil, got %s", tt.want)
+				}
+			}
+			if !tt.args.quiet {
+				if strings.Index(strings.Split(s, "0")[0], strings.Split(tt.want, " ")[0]) != 0 {
+					t.Errorf("expected return to start with %s, got %s", tt.want, s)
+				}
+			}
 		})
 	}
 }
