@@ -24,7 +24,3 @@ jobs:
       - name: Test and Build
         run: make build
 
-  generate_coverage_with_sonarcloud:
-    name: "Analyse with SonarCloud"
-    runs-on: ubuntu-24.04
-
