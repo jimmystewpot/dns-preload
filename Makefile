@@ -6,7 +6,7 @@ TOOL := dns-preload
 export PATH = $(shell echo $$PATH):/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/build/bin:/home/runner/go:/home/runner/go/bin:
 BINPATH := bin
 GO_DIR := src/github.com/jimmystewpot/dns-preload/
-DOCKER_IMAGE := golang:1.21-bookworm
+DOCKER_IMAGE := golang:1.23-bookworm
 SYNK_IMAGE := snyk/snyk:golang
 INTERACTIVE := $(shell [ -t 0 ] && echo 1)
 TEST_DIRS := ./...
@@ -57,7 +57,7 @@ deps:
 	@echo ""
 	@echo "***** Installing dependencies for ${TOOL} *****"
 	go clean --cache
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
 
 dns-preload:
 	@echo ""
