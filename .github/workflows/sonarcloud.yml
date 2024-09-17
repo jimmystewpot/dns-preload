@@ -13,17 +13,6 @@ permissions:
   pull-requests: read # allows SonarCloud to decorate PRs with analysis results
 
 jobs:
-  build_and_test:
-    name: "Lint Test and Build"
-    runs-on: ubuntu-24.04
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Test and Build
-        run: make build
-
   generate_coverage_with_sonarcloud:
     name: "Analyse with SonarCloud"
     runs-on: ubuntu-24.04
