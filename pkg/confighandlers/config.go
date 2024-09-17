@@ -38,13 +38,14 @@ type QueryType struct {
 	// TXT for doing a query for type TXT
 	TXT []string `yaml:"txt" json:"txt" validate:"dive,fqdn"`
 	// PTR for doing a query for type PTR
-	PTR        []string `yaml:"ptr" json:"ptr" validate:"dive,ip_addr"`
-	CnameCount uint16   `yaml:",omitempty"`
-	HostsCount uint16   `yaml:",omitempty"`
-	NSCount    uint16   `yaml:",omitempty"`
-	MXCount    uint16   `yaml:",omitempty"`
-	TXTCount   uint16   `yaml:",omitempty"`
-	PTRCount   uint16   `yaml:",omitempty"`
+	PTR []string `yaml:"ptr" json:"ptr" validate:"dive,ip_addr"`
+	// Metrics values below this point.
+	CnameCount uint16 `yaml:",omitempty"`
+	HostsCount uint16 `yaml:",omitempty"`
+	NSCount    uint16 `yaml:",omitempty"`
+	MXCount    uint16 `yaml:",omitempty"`
+	TXTCount   uint16 `yaml:",omitempty"`
+	PTRCount   uint16 `yaml:",omitempty"`
 }
 
 // PopulateCounts for how many domains are in each query_type.
