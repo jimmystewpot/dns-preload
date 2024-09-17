@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build_and_test:
-    name: "Build, Test and Run SonarCloud"
+    name: "Lint Test and Build"
     runs-on: ubuntu-24.04
 
     steps:
@@ -23,6 +23,16 @@ jobs:
           fetch-depth: 0
       - name: Test and Build
         run: make build
+
+  generate_coverage_with_sonarcloud:
+    name: "Analyse with SonarCloud"
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Run Tests
         run: make test
       - name: Analyze project with SonarCloud
