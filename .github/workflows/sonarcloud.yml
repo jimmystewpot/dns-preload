@@ -13,17 +13,15 @@ permissions:
   pull-requests: read # allows SonarCloud to decorate PRs with analysis results
 
 jobs:
-  Analysis:
-    runs-on: ubuntu-22.04
+  generate_coverage_with_sonarcloud:
+    name: "Analyse with SonarCloud"
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install Test Dependencies
-        run: make deps
-      - name: Run golangci-lint
-        run: make lint
+
       - name: Run Tests
         run: make test
       - name: Analyze project with SonarCloud
