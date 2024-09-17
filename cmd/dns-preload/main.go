@@ -31,6 +31,7 @@ const (
 )
 
 var (
+	//nolint:govet // fieldalignment is not required here.
 	cli struct {
 		All    Preload       `cmd:"" help:"preload all of the following types from the configuration file"`
 		Cname  Preload       `cmd:"" help:"preload only the cname entries from the configuration file"`
@@ -48,27 +49,27 @@ var (
 )
 
 type Preload struct {
-	ConfigFile string        `required:"" help:"The configuration file to read the domain list to query from"`
-	Server     string        `default:"localhost" help:"The server to query to seed the domain list into"`
-	Port       string        `default:"53" help:"The port the DNS server listens for requests on"`
+	resolver   dns.CustomResolver
+	ConfigFile string `required:"" help:"The configuration file to read the domain list to query from"`
+	Server     string `default:"localhost" help:"The server to query to seed the domain list into"`
+	Port       string `default:"53" help:"The port the DNS server listens for requests on"`
+	nameserver string
+	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed (not implemented)"`
 	Workers    uint8         `default:"2" help:"The number of concurrent goroutines used to query the DNS server"`
 	Mute       bool          `default:"false" help:"Suppress the preload task output to the console"`
 	Quiet      bool          `default:"false" help:"Suppress the preload response output to the console"`
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Debug      bool          `default:"false" help:"Debug mode"`
-	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed (not implemented)"`
-	resolver   dns.CustomResolver
-	nameserver string
 }
 
 type Config struct {
+	Validate struct {
+		ConfigFile string `required:"" help:"The configuration file to load"`
+	} `cmd:"" help:"Validate a configuration file"`
 	Quiet    bool `default:"false" help:"Suppress the info output to the console"`
 	Generate struct {
 		Generate bool `default:"true" help:"Generate an empty configuration and output it to stdout"`
 	} `cmd:"" help:"Generate a configuration file"`
-	Validate struct {
-		ConfigFile string `required:"" help:"The configuration file to load"`
-	} `cmd:"" help:"Validate a configuration file"`
 }
 
 // Config Run() prints an empty YAML configuration to stdout.
@@ -394,10 +395,11 @@ func (p *Preload) IntroPrinter(queryType string, hosts []string) {
 }
 
 // CompletedPrinter prints out a completion message and a timer to stdout.
-func completedPrinter(quiet bool, t time.Time) {
+func completedPrinter(quiet bool, t time.Time) string {
 	if !quiet {
-		fmt.Printf(completedMessage+"\n", time.Since(t))
+		return fmt.Sprintf(completedMessage+"\n", time.Since(t))
 	}
+	return ""
 }
 
 // createErrGroup handles the logic to setup an errgroup for concurrency.

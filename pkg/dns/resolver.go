@@ -20,7 +20,9 @@ type Resolver struct {
 	client *net.Resolver
 }
 
+// NewResolver creates a custom resolver where the DNS servers are pinned.
 func NewResolver(nameserver string, timeout time.Duration) *Resolver {
+	//nolint:revive // address is a returned function, it gets set by the caller.
 	return &Resolver{
 		client: &net.Resolver{
 			PreferGo:     true,
