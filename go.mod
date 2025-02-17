@@ -3,7 +3,7 @@ module github.com/jimmystewpot/dns-preload
 go 1.23
 
 require (
-	github.com/alecthomas/kong v1.8.0
+	github.com/alecthomas/kong v1.8.1
 	github.com/go-playground/validator/v10 v10.24.0
 	golang.org/x/sync v0.11.0
 	gopkg.in/yaml.v3 v3.0.1
