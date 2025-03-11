@@ -38,12 +38,11 @@ builds:
       - arm64
 
     goarm:
-      - "6"
-      - "7"
+      - 6
+      - 7
 
     goamd64:
-      - v2
-      - v3
+      - v1
 
     ignore:
       - goos: darwin
@@ -70,3 +69,44 @@ checksum:
 release:
   mode: append
   skip_upload: false
+
+sboms:
+  - id: dns-preload
+
+    documents:
+      - "${artifact}.spdx.sbom.json"
+
+    # Path to the SBOM generator command
+    #
+    # Note: the process CWD will be set to the same location as "dist"
+    #
+    # Default: 'syft'.
+    cmd: syft
+
+    args: ["$artifact", "--output", "spdx-json=$document"]
+
+    env:
+      - SYFT_GOLANG_SEARCH_LOCAL_MOD_CACHE_LICENSES=true
+      - SYFT_GOLANG_SEARCH_REMOTE_LICENSES=true
+
+    # Which artifacts to catalog.
+    #
+    # Valid options are:
+    # - any:        let the SBOM tool decide which artifacts available in
+    #               the cwd should be cataloged
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - binary:     binaries output from the build stage
+    #
+    # Default: 'archive'.
+    artifacts: binary
+
+    # IDs of the artifacts to catalog.
+    #
+    # If `artifacts` is "source" or "any" then this fields has no effect.
+    #ids:
+    #  - foo
+    #   - bar
