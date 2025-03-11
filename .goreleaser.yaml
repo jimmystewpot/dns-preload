@@ -70,3 +70,42 @@ checksum:
 release:
   mode: append
   skip_upload: false
+
+sboms:
+  - id: dns-preload
+
+    documents:
+      - "${artifact}.spdx.sbom.json"
+
+    # Path to the SBOM generator command
+    #
+    # Note: the process CWD will be set to the same location as "dist"
+    #
+    # Default: 'syft'.
+    cmd: syft
+
+    args: ["$artifact", "--output", "spdx-json=$document"]
+
+    env: []
+
+    # Which artifacts to catalog.
+    #
+    # Valid options are:
+    # - any:        let the SBOM tool decide which artifacts available in
+    #               the cwd should be cataloged
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - binary:     binaries output from the build stage
+    #
+    # Default: 'archive'.
+    artifacts: binary
+
+    # IDs of the artifacts to catalog.
+    #
+    # If `artifacts` is "source" or "any" then this fields has no effect.
+    #ids:
+    #  - foo
+    #  - bar
