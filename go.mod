@@ -1,6 +1,9 @@
 module github.com/jimmystewpot/dns-preload
 
-go 1.23
+go 1.23.0
+
+toolchain go1.24.1
+
 require (
 	github.com/alecthomas/kong v1.8.1
 	github.com/go-playground/validator/v10 v10.25.0
