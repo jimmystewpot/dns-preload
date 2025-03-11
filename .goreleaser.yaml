@@ -81,7 +81,7 @@ sboms:
     # Note: the process CWD will be set to the same location as "dist"
     #
     # Default: 'syft'.
-    cmd: syft
+    cmd: bin/syft
 
     args: ["$artifact", "--output", "spdx-json=$document"]
 
