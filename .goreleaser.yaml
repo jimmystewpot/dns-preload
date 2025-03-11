@@ -38,12 +38,11 @@ builds:
       - arm64
 
     goarm:
-      - "6"
-      - "7"
+      - 6
+      - 7
 
     goamd64:
-      - v2
-      - v3
+      - v1
 
     ignore:
       - goos: darwin
@@ -86,7 +85,9 @@ sboms:
 
     args: ["$artifact", "--output", "spdx-json=$document"]
 
-    env: []
+    env:
+      - SYFT_GOLANG_SEARCH_LOCAL_MOD_CACHE_LICENSES=true
+      - SYFT_GOLANG_SEARCH_REMOTE_LICENSES=true
 
     # Which artifacts to catalog.
     #
@@ -108,4 +109,4 @@ sboms:
     # If `artifacts` is "source" or "any" then this fields has no effect.
     #ids:
     #  - foo
-    #  - bar
+    #   - bar
