@@ -4,6 +4,7 @@ report_sizes: true
 before:
   hooks:
     - go mod tidy
+    - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b .
 
 gomod:
   proxy: true
@@ -81,7 +82,7 @@ sboms:
     # Note: the process CWD will be set to the same location as "dist"
     #
     # Default: 'syft'.
-    cmd: "{{ .Env.GITHUB_WORKSPACE }}/bin/syft"
+    cmd: syft
 
     args: ["$artifact", "--output", "spdx-json=$document"]
 
