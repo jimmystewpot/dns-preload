@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable
-      - run: curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b ${GITHUB_WORKSPACE}/bin
       - name: Run GoReleaser Build
         uses: goreleaser/goreleaser-action@v6
         with:
