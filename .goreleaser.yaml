@@ -5,7 +5,7 @@ before:
   hooks:
     - go mod tidy
     - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b dist/
-    - export PATH=$PATH:$CWD/dist
+    - PATH=$PATH:$CWD/dist
 
 gomod:
   proxy: true
