@@ -21,7 +21,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable
+          go-version: stable  
       - name: Run GoReleaser Build
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -36,3 +36,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER }}
+          PATH: ${{ env.PATH }}:${{ env.GITHUB_WORKSPACE }}/dist:${{ env.GITHUB_WORKSPACE }}/bin

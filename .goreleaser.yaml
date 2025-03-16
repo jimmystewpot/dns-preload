@@ -5,7 +5,6 @@ before:
   hooks:
     - go mod tidy
     - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b dist/
-    - PATH=$PATH:$CWD/dist
 
 gomod:
   proxy: true
@@ -83,7 +82,7 @@ sboms:
     # Note: the process CWD will be set to the same location as "dist"
     #
     # Default: 'syft'.
-    cmd: syft
+    cmd: dist/syft
 
     args: ["$artifact", "--output", "spdx-json=$document"]
 
