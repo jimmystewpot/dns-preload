@@ -28,9 +28,9 @@ lint:
 	@echo ""
 	@echo "***** linting ${TOOL} with golangci-lint *****"
 ifdef INTERACTIVE
-	golangci-lint run -v $(TEST_DIRS)
+	GOFLAGS=-buildvcs=false golangci-lint run -v $(TEST_DIRS)
 else
-	golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
+	GOFLAGS=-buildvcs=false golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
 endif
 .PHONY: lint
 
