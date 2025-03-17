@@ -14,21 +14,28 @@ jobs:
   goreleaser:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
+      - 
+        name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Go
+      - 
+        name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: stable  
-      - name: Run GoReleaser Build
+      - 
+        name: Run GoReleaser Build
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
           args: build --clean
-      - name: Run GoReleaser Release
+      -
+        name: Install Syft
+        run: go install github.com/anchore/syft/cmd/syft@latest
+      - 
+        name: Run GoReleaser Release
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
@@ -36,4 +43,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GORELEASER }}
-          PATH: ${{ env.PATH }}:${{ env.GITHUB_WORKSPACE }}/dist:${{ env.GITHUB_WORKSPACE }}/bin
+
