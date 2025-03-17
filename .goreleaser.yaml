@@ -4,7 +4,7 @@ report_sizes: true
 before:
   hooks:
     - go mod tidy
-    - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b "${{ .Env.GITHUB_WORKSPACE }}/bin/"
+    - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b "{{ .Env.GITHUB_WORKSPACE }}/bin/"
 
 gomod:
   proxy: true
@@ -89,7 +89,7 @@ sboms:
     env:
       - SYFT_GOLANG_SEARCH_LOCAL_MOD_CACHE_LICENSES=true
       - SYFT_GOLANG_SEARCH_REMOTE_LICENSES=true
-      - PATH=$PATH:'${{ .Env.GITHUB_WORKSPACE }}/bin }}'
+      - PATH=$PATH:'{{ .Env.GITHUB_WORKSPACE }}/bin }}'
 
     # Which artifacts to catalog.
     #
