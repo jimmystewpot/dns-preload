@@ -74,7 +74,7 @@ sboms:
   - id: dns-preload
 
     documents:
-      - "${artifact}.spdx.sbom.json"
+      - "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}.sbom.json"
 
     # Path to the SBOM generator command
     #
