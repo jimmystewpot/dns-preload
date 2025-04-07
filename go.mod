@@ -1,10 +1,11 @@
 module github.com/jimmystewpot/dns-preload
 
 go 1.24.0
+
 require (
 	github.com/alecthomas/kong v1.9.0
 	github.com/go-playground/validator/v10 v10.26.0
-	golang.org/x/sync v0.12.0
+	golang.org/x/sync v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
