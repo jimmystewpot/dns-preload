@@ -79,7 +79,7 @@ sboms:
   - id: dns-preload
 
     documents:
-      - "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}.sbom.json"
+      - "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}_{{ .Target }}.sbom.json"
 
     # Path to the SBOM generator command
     #
