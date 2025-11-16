@@ -52,7 +52,7 @@ build: get-golang
 		-t ${DOCKER_IMAGE} \
 		make build-all
 
-build-all: deps lint test dns-preload
+build-all: dns-preload
 
 test-all: deps lint test
 
