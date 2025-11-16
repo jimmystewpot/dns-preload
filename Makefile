@@ -10,6 +10,8 @@ DOCKER_IMAGE := golang:1.25-bookworm
 SYNK_IMAGE := snyk/snyk:golang
 INTERACTIVE := $(shell [ -t 0 ] && echo 1)
 TEST_DIRS := ./...
+GOLANGCI_LINT_VERSION := v2.6.2
+GOLANGCI_LINT_CMD := docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:${GOLANGCI_LINT_VERSION} golangci-lint
 
 get-golang:
 	docker pull ${DOCKER_IMAGE}
@@ -24,13 +26,13 @@ get-sonarcloud:
 clean:
 	@echo $(shell docker images -qa -f 'dangling=true'|egrep '[a-z0-9]+' && docker rmi $(shell docker images -qa -f 'dangling=true'))
 
-lint:
+lint: deps
 	@echo ""
 	@echo "***** linting ${TOOL} with golangci-lint *****"
 ifdef INTERACTIVE
-	GOFLAGS=-buildvcs=false golangci-lint run -v $(TEST_DIRS)
+	docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v2.6.2 golangci-lint run -v $(TEST_DIRS)
 else
-	GOFLAGS=-buildvcs=false golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
+	docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v2.6.2 golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
 endif
 .PHONY: lint
 
@@ -57,14 +59,14 @@ deps:
 	@echo ""
 	@echo "***** Installing dependencies for ${TOOL} *****"
 	go clean --cache
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v2.6.2
+	docker pull golangci/golangci-lint:v2.6.2
 
 dns-preload:
 	@echo ""
 	@echo "***** Building ${TOOL} *****"
 	git config --global --add safe.directory /build/src/github.com/jimmystewpot/dns-preload
 	git status
-	go build -race -trimpath -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
+	go build -trimpath -ldflags="-s -w" -o $(BINPATH)/$(TOOL) ./cmd/$(TOOL)
 	@echo ""
 
 linux-arm64:
