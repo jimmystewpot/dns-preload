@@ -56,6 +56,18 @@ build-all: deps lint test dns-preload
 
 test-all: deps lint test
 
+test-ci: get-golang
+	@echo ""
+	@echo "***** Testing ${TOOL} *****"
+	@docker run \
+		--rm \
+		-v $(CURDIR):/build/$(GO_DIR) \
+		--workdir /build/$(GO_DIR) \
+		-e GOPATH=/build \
+		-e PATH=$(PATH) \
+		-t ${DOCKER_IMAGE} \
+		make test
+
 deps:
 	@echo ""
 	@echo "***** Installing dependencies for ${TOOL} *****"
