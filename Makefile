@@ -33,7 +33,7 @@ lint: deps
 ifdef INTERACTIVE
 	${GOLANGCI_LINT_CMD} run -v $(TEST_DIRS)
 else
-	${GOLANGCI_LINT_CMD} run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
+	${GOLANGCI_LINT_CMD} run --output.checkstyle.path stdout -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
 endif
 .PHONY: lint
 
