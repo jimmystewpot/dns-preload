@@ -70,8 +70,6 @@ checksum:
   algorithm: sha256
   split: true
   disable: false
-  extra_files:
-    - glob: LICENSE
 
 release:
   mode: append
