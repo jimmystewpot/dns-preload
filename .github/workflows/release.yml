@@ -23,14 +23,7 @@ jobs:
         name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable  
-      - 
-        name: Run GoReleaser Build
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: latest
-          args: build --clean
+          go-version: stable
       -
         name: Install Syft
         run: go install github.com/anchore/syft/cmd/syft@latest
@@ -39,7 +32,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: latest
+          version: '~> v2'
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
