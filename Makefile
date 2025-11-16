@@ -10,8 +10,9 @@ DOCKER_IMAGE := golang:1.25-bookworm
 SYNK_IMAGE := snyk/snyk:golang
 INTERACTIVE := $(shell [ -t 0 ] && echo 1)
 TEST_DIRS := ./...
+GOLANGCI_LINT_IMAGE := golangci/golangci-lint
 GOLANGCI_LINT_VERSION := v2.6.2
-GOLANGCI_LINT_CMD := docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:${GOLANGCI_LINT_VERSION} golangci-lint
+GOLANGCI_LINT_CMD := docker run --rm -v ${PWD}:/app -w /app ${GOLANGCI_LINT_IMAGE}:${GOLANGCI_LINT_VERSION} golangci-lint
 
 get-golang:
 	docker pull ${DOCKER_IMAGE}
@@ -30,9 +31,9 @@ lint: deps
 	@echo ""
 	@echo "***** linting ${TOOL} with golangci-lint *****"
 ifdef INTERACTIVE
-	docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v2.6.2 golangci-lint run -v $(TEST_DIRS)
+	${GOLANGCI_LINT_CMD} run -v $(TEST_DIRS)
 else
-	docker run --rm -v ${PWD}:/app -w /app golangci/golangci-lint:v2.6.2 golangci-lint run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
+	${GOLANGCI_LINT_CMD} run --out-format checkstyle -v $(TEST_DIRS) 1> reports/checkstyle-lint.xml
 endif
 .PHONY: lint
 
@@ -59,7 +60,7 @@ deps:
 	@echo ""
 	@echo "***** Installing dependencies for ${TOOL} *****"
 	go clean --cache
-	docker pull golangci/golangci-lint:v2.6.2
+	docker pull ${GOLANGCI_LINT_IMAGE}:${GOLANGCI_LINT_VERSION}
 
 dns-preload:
 	@echo ""
