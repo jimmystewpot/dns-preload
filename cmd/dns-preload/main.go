@@ -12,6 +12,7 @@ import (
 	"github.com/jimmystewpot/dns-preload/pkg/confighandlers"
 	"github.com/jimmystewpot/dns-preload/pkg/dns"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 )
 
 const (
@@ -54,12 +55,13 @@ type Preload struct {
 	Server     string `default:"localhost" help:"The server to query to seed the domain list into"`
 	Port       string `default:"53" help:"The port the DNS server listens for requests on"`
 	nameserver string
-	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed (not implemented)"`
-	Workers    uint8         `default:"2" help:"The number of concurrent goroutines used to query the DNS server"`
+	Timeout    time.Duration `default:"30s" help:"The timeout for each DNS query to succeed"`
+	Workers    uint8         `default:"10" help:"The number of concurrent goroutines used to query the DNS server"`
 	Mute       bool          `default:"false" help:"Suppress the preload task output to the console"`
 	Quiet      bool          `default:"false" help:"Suppress the preload response output to the console"`
 	Full       bool          `default:"true" help:"For record types that return a Hostname ensure that these are resolved"`
 	Debug      bool          `default:"false" help:"Debug mode"`
+	DNSSEC     bool          `default:"false" help:"Enable DNSSEC validation for queries"`
 }
 
 type Config struct {
@@ -146,14 +148,25 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 //nolint:dupl // duplication of logic but not functionality
 func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 	batch := time.Now()
-	g := createErrGroup(p.Workers)
+	g, ctx := errgroup.WithContext(ctx)
+	sem := semaphore.NewWeighted(int64(p.Workers))
 	for i := 0; i < len(hosts); i++ {
 		host := hosts[i]
+		if err := sem.Acquire(ctx, 1); err != nil {
+			return err
+		}
 		g.Go(func() error {
+			defer sem.Release(1)
 			s := time.Now()
 			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
 			defer cancel()
-			result, err := p.resolver.LookupCNAME(deadline, host)
+			var result string
+			var err error
+			if p.DNSSEC {
+				result, err = p.resolver.LookupCNAMEWithDNSSEC(deadline, host)
+			} else {
+				result, err = p.resolver.LookupCNAME(deadline, host)
+			}
 			if err != nil {
 				return err
 			}
@@ -180,14 +193,25 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 //nolint:dupl // duplication of logic but not functionality
 func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 	batch := time.Now()
-	g := createErrGroup(p.Workers)
+	g, ctx := errgroup.WithContext(ctx)
+	sem := semaphore.NewWeighted(int64(p.Workers))
 	for i := 0; i < len(hosts); i++ {
 		host := hosts[i]
+		if err := sem.Acquire(ctx, 1); err != nil {
+			return err
+		}
 		g.Go(func() error {
+			defer sem.Release(1)
 			s := time.Now()
 			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
 			defer cancel()
-			result, err := p.resolver.LookupIPAddr(deadline, host)
+			var result []net.IPAddr
+			var err error
+			if p.DNSSEC {
+				result, err = p.resolver.LookupIPAddrWithDNSSEC(deadline, host)
+			} else {
+				result, err = p.resolver.LookupIPAddr(deadline, host)
+			}
 			if err != nil {
 				return err
 			}
@@ -215,10 +239,15 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 //nolint:dupl // duplication of logic but not functionality
 func (p *Preload) MX(ctx context.Context, hosts []string) error {
 	batch := time.Now()
-	g := createErrGroup(p.Workers)
+	g, ctx := errgroup.WithContext(ctx)
+	sem := semaphore.NewWeighted(int64(p.Workers))
 	for i := 0; i < len(hosts); i++ {
 		host := hosts[i]
+		if err := sem.Acquire(ctx, 1); err != nil {
+			return err
+		}
 		g.Go(func() error {
+			defer sem.Release(1)
 			s := time.Now()
 			deadline, cancel := context.WithDeadline(ctx, time.Now().Add(p.Timeout))
 			defer cancel()

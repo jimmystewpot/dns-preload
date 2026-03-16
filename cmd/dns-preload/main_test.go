@@ -135,6 +135,14 @@ func (m *Mockresolver) LookupNS(ctx context.Context, host string) ([]*net.NS, er
 	return []*net.NS{}, fmt.Errorf(nxDomainErr, host)
 }
 
+func (m *Mockresolver) LookupCNAMEWithDNSSEC(ctx context.Context, host string) (string, error) {
+	return m.LookupCNAME(ctx, host)
+}
+
+func (m *Mockresolver) LookupIPAddrWithDNSSEC(ctx context.Context, host string) ([]net.IPAddr, error) {
+	return m.LookupIPAddr(ctx, host)
+}
+
 func TestPreloadHosts(t *testing.T) {
 	ctx := context.Background()
 	type fields struct {
