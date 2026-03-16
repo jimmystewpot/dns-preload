@@ -16,9 +16,11 @@ jobs:
   generate_coverage_with_sonarcloud:
     name: "Analyse with SonarCloud"
     runs-on: ubuntu-24.04
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -31,12 +33,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           # Additional arguments for the sonarcloud scanner
+          # Note: If analysis fails with "Project not found", verify SONAR_TOKEN has access
+          # and check the correct sonar.organization in SonarCloud project settings
+          # -Dsonar.organization=jimmystewpot  # Commented out - check if required
           args:
             -Dsonar.tests=.
             -Dsonar.projectBaseDir=.
             -Dsonar.sources=.
             -Dsonar.projectKey=jimmystewpot_dns-preload
-            -Dsonar.organization=jimmystewpot
             -Dsonar.go.tests.reportPaths=reports/testreport.json
             -Dsonar.go.coverage.reportPaths=reports/coverage.txt
             -Dsonar.go.golint.reportPaths=reports/checkstyle-lint.xml

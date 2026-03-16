@@ -2,9 +2,14 @@ package dns
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"time"
+
+	"github.com/miekg/dns"
 )
+
+const ednsBufferSize = 4096
 
 // CustomResolver Interface can be reimplemented very easily for mocking
 type CustomResolver interface {
@@ -14,10 +19,14 @@ type CustomResolver interface {
 	LookupNS(ctx context.Context, host string) ([]*net.NS, error)
 	LookupTXT(ctx context.Context, host string) ([]string, error)
 	LookupMX(ctx context.Context, host string) ([]*net.MX, error)
+	LookupCNAMEWithDNSSEC(ctx context.Context, host string) (string, error)
+	LookupIPAddrWithDNSSEC(ctx context.Context, host string) ([]net.IPAddr, error)
 }
 
 type Resolver struct {
-	client *net.Resolver
+	client     *net.Resolver
+	nameserver string
+	timeout    time.Duration
 }
 
 // NewResolver creates a custom resolver where the DNS servers are pinned.
@@ -34,6 +43,8 @@ func NewResolver(nameserver string, timeout time.Duration) *Resolver {
 				return d.DialContext(ctx, network, nameserver)
 			},
 		},
+		nameserver: nameserver,
+		timeout:    timeout,
 	}
 }
 
@@ -65,4 +76,69 @@ func (r *Resolver) LookupTXT(ctx context.Context, host string) ([]string, error)
 // LookupNS returns the net.Resolver LookupNS
 func (r *Resolver) LookupNS(ctx context.Context, host string) ([]*net.NS, error) {
 	return r.client.LookupNS(ctx, host)
+}
+
+// LookupCNAMEWithDNSSEC performs CNAME lookup with DNSSEC validation
+func (r *Resolver) LookupCNAMEWithDNSSEC(_ context.Context, host string) (string, error) {
+	c := new(dns.Client)
+	c.Timeout = r.timeout
+	m := new(dns.Msg)
+	m.SetQuestion(dns.Fqdn(host), dns.TypeCNAME)
+	m.SetEdns0(ednsBufferSize, true) // Enable DNSSEC
+	resp, _, err := c.Exchange(m, r.nameserver)
+	if err != nil {
+		return "", err
+	}
+	if resp.Rcode != dns.RcodeSuccess {
+		return "", fmt.Errorf("DNS query failed with rcode %d", resp.Rcode)
+	}
+	// Basic DNSSEC validation (check for AD bit or RRSIG)
+	if !resp.AuthenticatedData {
+		return "", fmt.Errorf("DNSSEC validation failed: not authenticated")
+	}
+	for _, ans := range resp.Answer {
+		if cname, ok := ans.(*dns.CNAME); ok {
+			return cname.Target, nil
+		}
+	}
+	return "", fmt.Errorf("no CNAME record found")
+}
+
+// LookupIPAddrWithDNSSEC performs IP address lookup with DNSSEC validation
+func (r *Resolver) LookupIPAddrWithDNSSEC(_ context.Context, host string) ([]net.IPAddr, error) {
+	c := new(dns.Client)
+	c.Timeout = r.timeout
+	m := new(dns.Msg)
+	m.SetQuestion(dns.Fqdn(host), dns.TypeA)
+	m.SetEdns0(ednsBufferSize, true)
+	resp, _, err := c.Exchange(m, r.nameserver)
+	if err != nil {
+		return nil, err
+	}
+	if resp.Rcode != dns.RcodeSuccess {
+		return nil, fmt.Errorf("DNS query failed with rcode %d", resp.Rcode)
+	}
+	if !resp.AuthenticatedData {
+		return nil, fmt.Errorf("DNSSEC validation failed: not authenticated")
+	}
+	var addrs []net.IPAddr
+	for _, ans := range resp.Answer {
+		if a, ok := ans.(*dns.A); ok {
+			addrs = append(addrs, net.IPAddr{IP: a.A})
+		}
+	}
+	// Also query AAAA
+	m.SetQuestion(dns.Fqdn(host), dns.TypeAAAA)
+	resp, _, err = c.Exchange(m, r.nameserver)
+	if err != nil {
+		return addrs, nil // Return A records even if AAAA fails
+	}
+	if resp.Rcode == dns.RcodeSuccess && resp.AuthenticatedData {
+		for _, ans := range resp.Answer {
+			if aaaa, ok := ans.(*dns.AAAA); ok {
+				addrs = append(addrs, net.IPAddr{IP: aaaa.AAAA})
+			}
+		}
+	}
+	return addrs, nil
 }

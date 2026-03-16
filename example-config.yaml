@@ -1,5 +1,10 @@
----
+# Example configuration for dns-preload
+# This file demonstrates how to configure domains for DNS preloading.
+# Customize the lists below with your most important domains to ensure fast resolution on reconnection.
+
 query_type:
+  # hosts: Domains to resolve to IP addresses (A and AAAA records)
+  # Add frequently visited websites here for instant loading
   hosts:
     - google.com
     - microsoft.com
@@ -18,18 +23,33 @@ query_type:
     - netflix.com
     - github.com
     - bitbucket.org
+
+  # ns: Domains to query for nameservers (NS records)
+  # Useful for domains where you need to know the authoritative servers
   ns:
   - github.com
+
+  # mx: Domains to query for mail servers (MX records)
+  # Preload for email services to speed up mail client connections
   mx:
   - gmail.com
   - hotmail.com
   - yahoo.com
   - yahoo.co.uk
+
+  # txt: Domains to query for text records (TXT records)
+  # Often used for SPF, DKIM, or other verification records
   txt:
   - salesforce.com
   - linkedin.com
+
+  # cname: Domains to query for canonical names (CNAME records)
+  # Useful for subdomains that alias to other domains
   cname:
   - www.salesforce.com
+
+  # ptr: IP addresses to query for reverse DNS (PTR records)
+  # For reverse lookups, e.g., logging or security checks
   ptr:
   - 2404:6800:4006:804::200e
 
