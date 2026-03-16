@@ -3,3 +3,4 @@ main
 bin/
 reports/
 dist/
+dns-preload

@@ -144,8 +144,6 @@ func (p *Preload) RunQueries(ctx context.Context, cmd string, cfg *confighandler
 }
 
 // CNAME preload the nameserver with CNAME lookups for a given list of hostnames.
-//
-//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g, ctx := errgroup.WithContext(ctx)
@@ -189,8 +187,6 @@ func (p *Preload) CNAME(ctx context.Context, hosts []string) error {
 }
 
 // Hosts preload the nameserver with IP addresses for a given list of hostnames.
-//
-//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g, ctx := errgroup.WithContext(ctx)
@@ -235,8 +231,6 @@ func (p *Preload) Hosts(ctx context.Context, hosts []string) error {
 }
 
 // MX preloads the nameserver with the MX records for a given list of hostnames.
-//
-//nolint:dupl // duplication of logic but not functionality
 func (p *Preload) MX(ctx context.Context, hosts []string) error {
 	batch := time.Now()
 	g, ctx := errgroup.WithContext(ctx)

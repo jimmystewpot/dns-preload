@@ -1,7 +1,9 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jimmystewpot_dns-preload&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jimmystewpot_dns-preload) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jimmystewpot_dns-preload&metric=coverage)](https://sonarcloud.io/summary/new_code?id=jimmystewpot_dns-preload) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jimmystewpot_dns-preload&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=jimmystewpot_dns-preload) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jimmystewpot_dns-preload&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=jimmystewpot_dns-preload) [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=jimmystewpot_dns-preload&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=jimmystewpot_dns-preload) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jimmystewpot_dns-preload&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=jimmystewpot_dns-preload)
 # dns-preload
 
-**Tired of waiting minutes for websites to load after your satellite connection drops?** dns-preload is a lightweight Go tool that preloads DNS records into your nameserver's cache. It ensures your most important domains resolve instantly upon reconnection—no more staring at loading screens.
+**Tired of waiting minutes for websites to load after your satellite connection drops?** 
+
+dns-preload is a lightweight Go tool that preloads DNS records into your nameserver's cache. It ensures your most important domains resolve instantly upon reconnection—no more staring at loading screens.
 
 Unlike local caching tools, dns-preload doesn't store records itself—it queries your upstream DNS server to populate *its* cache proactively. Perfect for unreliable connections like satellite internet or train Wi-Fi.
 

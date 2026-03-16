@@ -9,6 +9,8 @@ import (
 	"github.com/miekg/dns"
 )
 
+const ednsBufferSize = 4096
+
 // CustomResolver Interface can be reimplemented very easily for mocking
 type CustomResolver interface {
 	LookupCNAME(ctx context.Context, host string) (string, error)
@@ -77,12 +79,12 @@ func (r *Resolver) LookupNS(ctx context.Context, host string) ([]*net.NS, error)
 }
 
 // LookupCNAMEWithDNSSEC performs CNAME lookup with DNSSEC validation
-func (r *Resolver) LookupCNAMEWithDNSSEC(ctx context.Context, host string) (string, error) {
+func (r *Resolver) LookupCNAMEWithDNSSEC(_ context.Context, host string) (string, error) {
 	c := new(dns.Client)
 	c.Timeout = r.timeout
 	m := new(dns.Msg)
 	m.SetQuestion(dns.Fqdn(host), dns.TypeCNAME)
-	m.SetEdns0(4096, true) // Enable DNSSEC
+	m.SetEdns0(ednsBufferSize, true) // Enable DNSSEC
 	resp, _, err := c.Exchange(m, r.nameserver)
 	if err != nil {
 		return "", err
@@ -103,12 +105,12 @@ func (r *Resolver) LookupCNAMEWithDNSSEC(ctx context.Context, host string) (stri
 }
 
 // LookupIPAddrWithDNSSEC performs IP address lookup with DNSSEC validation
-func (r *Resolver) LookupIPAddrWithDNSSEC(ctx context.Context, host string) ([]net.IPAddr, error) {
+func (r *Resolver) LookupIPAddrWithDNSSEC(_ context.Context, host string) ([]net.IPAddr, error) {
 	c := new(dns.Client)
 	c.Timeout = r.timeout
 	m := new(dns.Msg)
 	m.SetQuestion(dns.Fqdn(host), dns.TypeA)
-	m.SetEdns0(4096, true)
+	m.SetEdns0(ednsBufferSize, true)
 	resp, _, err := c.Exchange(m, r.nameserver)
 	if err != nil {
 		return nil, err
