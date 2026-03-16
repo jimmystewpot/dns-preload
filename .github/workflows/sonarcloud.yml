@@ -33,12 +33,12 @@ jobs:
           # Additional arguments for the sonarcloud scanner
           # Note: If analysis fails with "Project not found", verify SONAR_TOKEN has access
           # and check the correct sonar.organization in SonarCloud project settings
+          # -Dsonar.organization=jimmystewpot  # Commented out - check if required
           args:
             -Dsonar.tests=.
             -Dsonar.projectBaseDir=.
             -Dsonar.sources=.
             -Dsonar.projectKey=jimmystewpot_dns-preload
-            # -Dsonar.organization=jimmystewpot  # Commented out - check if required
             -Dsonar.go.tests.reportPaths=reports/testreport.json
             -Dsonar.go.coverage.reportPaths=reports/coverage.txt
             -Dsonar.go.golint.reportPaths=reports/checkstyle-lint.xml
