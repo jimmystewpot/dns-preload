@@ -16,9 +16,11 @@ jobs:
   generate_coverage_with_sonarcloud:
     name: "Analyse with SonarCloud"
     runs-on: ubuntu-24.04
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
