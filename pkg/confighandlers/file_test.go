@@ -2,7 +2,10 @@ package confighandlers
 
 import (
 	"fmt"
+	"strings"
 	"testing"
+
+	validator "github.com/go-playground/validator/v10"
 )
 
 func TestLoadConfigFromFile(t *testing.T) {
@@ -277,3 +280,65 @@ func garbage(s int64) []string {
 func ptr(s string) *string {
 	return &s
 }
+
+func TestUint16Boundaries(t *testing.T) {
+	t.Run("boundary 65535", func(t *testing.T) {
+		s := make([]string, 65535)
+		got, err := Uint16(s)
+		if err != nil {
+			t.Errorf("Uint16(65535) unexpected error = %v", err)
+		}
+		if got != 65535 {
+			t.Errorf("Uint16(65535) = %d, want 65535", got)
+		}
+	})
+
+	t.Run("boundary 65536 overflow", func(t *testing.T) {
+		s := make([]string, 65536)
+		_, err := Uint16(s)
+		if err == nil {
+			t.Error("Uint16(65536) expected error for uint16 overflow, got nil")
+		}
+	})
+}
+
+func TestLoadConfigValidationFailures(t *testing.T) {
+	t.Run("invalid fqdn in hosts", func(t *testing.T) {
+		yamlData := `
+query_type:
+  hosts:
+    - "invalid fqdn with spaces"
+`
+		var cfg Configuration
+		err := cfg.LoadConfig(strings.NewReader(yamlData))
+		if err != nil {
+			t.Fatalf("LoadConfig error = %v", err)
+		}
+		_ = cfg.PopulateCounts()
+		val := validator.New()
+		err = val.Struct(&cfg)
+		if err == nil {
+			t.Error("expected validation error for invalid FQDN, got nil")
+		}
+	})
+
+	t.Run("invalid ip in ptr", func(t *testing.T) {
+		yamlData := `
+query_type:
+  ptr:
+    - "999.999.999.999"
+`
+		var cfg Configuration
+		err := cfg.LoadConfig(strings.NewReader(yamlData))
+		if err != nil {
+			t.Fatalf("LoadConfig error = %v", err)
+		}
+		_ = cfg.PopulateCounts()
+		val := validator.New()
+		err = val.Struct(&cfg)
+		if err == nil {
+			t.Error("expected validation error for invalid IP in PTR, got nil")
+		}
+	})
+}
+
