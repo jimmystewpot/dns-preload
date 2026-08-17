@@ -15,6 +15,7 @@ import (
 const (
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
+	testDomainWWW     string = "www.foo.bar"
 	googlePubDNS1     string = "8.8.4.4"
 	googlePubDNS2     string = "8.8.8.8"
 	googleIpv6        string = "2404:6800:4006:804::200e"
@@ -37,7 +38,7 @@ type Mockresolver struct{}
 func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, error) {
 	defer ctx.Done()
 	switch host {
-	case "www.foo.bar":
+	case testDomainWWW:
 		return testDomainNoErr, nil
 	case "www.bar.foo":
 		return "", fmt.Errorf(nxDomainErr, host)
@@ -1041,7 +1042,7 @@ func TestPreloadHighConcurrencyRace(t *testing.T) {
 
 	manyCNAMEs := make([]string, 100)
 	for i := 0; i < 100; i++ {
-		manyCNAMEs[i] = "www.foo.bar"
+		manyCNAMEs[i] = testDomainWWW
 	}
 
 	t.Run("concurrent CNAME", func(t *testing.T) {
@@ -1091,7 +1092,7 @@ func TestPreloadHighConcurrencyRace(t *testing.T) {
 	})
 }
 
-func TestPreloadContextCanceled(t *testing.T) {
+func TestPreloadContextCanceled(_ *testing.T) {
 	mock := NewMockResolver()
 	p := &Preload{
 		Workers:  2,
@@ -1173,4 +1174,3 @@ func TestRunQueriesEmptyCounts(t *testing.T) {
 		})
 	}
 }
-
