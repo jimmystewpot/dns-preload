@@ -10,7 +10,7 @@ on:
     - cron: "1 1 2 * *"
 
 permissions:
-  pull-requests: read # allows SonarCloud to decorate PRs with analysis results
+  contents: read
 
 jobs:
   build_and_test:

@@ -15,6 +15,7 @@ import (
 const (
 	testDomainNoErr   string = "foo.bar"
 	testDomainWithErr string = "bar.foo"
+	testDomainWWW     string = "www.foo.bar"
 	googlePubDNS1     string = "8.8.4.4"
 	googlePubDNS2     string = "8.8.8.8"
 	googleIpv6        string = "2404:6800:4006:804::200e"
@@ -37,7 +38,7 @@ type Mockresolver struct{}
 func (m *Mockresolver) LookupCNAME(ctx context.Context, host string) (string, error) {
 	defer ctx.Done()
 	switch host {
-	case "www.foo.bar":
+	case testDomainWWW:
 		return testDomainNoErr, nil
 	case "www.bar.foo":
 		return "", fmt.Errorf(nxDomainErr, host)
@@ -1005,4 +1006,171 @@ func TestCompletedPrinter(t *testing.T) {
 func returnIntInterface() interface{} {
 	x := []int{1, 2, 3, 4, 5}
 	return x
+}
+
+func TestCreateErrGroupEdgeCases(t *testing.T) {
+	t.Run("zero limit defaults to 1", func(t *testing.T) {
+		g := createErrGroup(0)
+		if g == nil {
+			t.Fatal("expected non-nil errgroup")
+		}
+	})
+	t.Run("positive worker limit", func(t *testing.T) {
+		g := createErrGroup(10)
+		if g == nil {
+			t.Fatal("expected non-nil errgroup")
+		}
+	})
+	t.Run("max uint8 limit", func(t *testing.T) {
+		g := createErrGroup(255)
+		if g == nil {
+			t.Fatal("expected non-nil errgroup")
+		}
+	})
+}
+
+func TestPreloadHighConcurrencyRace(t *testing.T) {
+	mock := NewMockResolver()
+	p := &Preload{
+		Workers:  50,
+		Quiet:    true,
+		Full:     false,
+		Timeout:  5 * time.Second,
+		resolver: mock,
+	}
+	ctx := context.Background()
+
+	manyCNAMEs := make([]string, 100)
+	for i := 0; i < 100; i++ {
+		manyCNAMEs[i] = testDomainWWW
+	}
+
+	t.Run("concurrent CNAME", func(t *testing.T) {
+		if err := p.CNAME(ctx, manyCNAMEs); err != nil {
+			t.Errorf("CNAME high concurrency error = %v", err)
+		}
+	})
+
+	manyHosts := make([]string, 100)
+	for i := 0; i < 100; i++ {
+		manyHosts[i] = testDomainNoErr
+	}
+
+	t.Run("concurrent Hosts", func(t *testing.T) {
+		if err := p.Hosts(ctx, manyHosts); err != nil {
+			t.Errorf("Hosts high concurrency error = %v", err)
+		}
+	})
+
+	t.Run("concurrent MX", func(t *testing.T) {
+		if err := p.MX(ctx, manyHosts); err != nil {
+			t.Errorf("MX high concurrency error = %v", err)
+		}
+	})
+
+	t.Run("concurrent NS", func(t *testing.T) {
+		if err := p.NS(ctx, manyHosts); err != nil {
+			t.Errorf("NS high concurrency error = %v", err)
+		}
+	})
+
+	t.Run("concurrent TXT", func(t *testing.T) {
+		if err := p.TXT(ctx, manyHosts); err != nil {
+			t.Errorf("TXT high concurrency error = %v", err)
+		}
+	})
+
+	manyPTRs := make([]string, 100)
+	for i := 0; i < 100; i++ {
+		manyPTRs[i] = googleIpv6
+	}
+
+	t.Run("concurrent PTR", func(t *testing.T) {
+		if err := p.PTR(ctx, manyPTRs); err != nil {
+			t.Errorf("PTR high concurrency error = %v", err)
+		}
+	})
+}
+
+func TestPreloadContextCanceled(_ *testing.T) {
+	mock := NewMockResolver()
+	p := &Preload{
+		Workers:  2,
+		Quiet:    true,
+		Timeout:  1 * time.Millisecond,
+		resolver: mock,
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	hosts := []string{testDomainWithErr}
+
+	// Should attempt lookup and return error since context is canceled and host is error domain
+	_ = p.CNAME(ctx, hosts)
+	_ = p.Hosts(ctx, hosts)
+	_ = p.MX(ctx, hosts)
+	_ = p.NS(ctx, hosts)
+	_ = p.TXT(ctx, hosts)
+	_ = p.PTR(ctx, hosts)
+}
+
+func TestResultsPrinterEdgeCases(t *testing.T) {
+	mock := NewMockResolver()
+	p := &Preload{
+		Workers:  1,
+		Quiet:    true,
+		Full:     true,
+		Timeout:  5 * time.Second,
+		resolver: mock,
+	}
+
+	t.Run("MX full resolution error", func(t *testing.T) {
+		// MX record containing a hostname that fails resolution in Hosts()
+		mxResults := []*net.MX{
+			{Host: testDomainWithErr, Pref: 10},
+		}
+		err := p.ResultsPrinter(testDomainNoErr, queryTypeMXStr, time.Second, mxResults)
+		if err == nil {
+			t.Error("expected error when full resolution of MX host fails, got nil")
+		}
+	})
+
+	t.Run("NS full resolution error", func(t *testing.T) {
+		// NS record containing a hostname that fails resolution in Hosts()
+		nsResults := []*net.NS{
+			{Host: testDomainWithErr},
+		}
+		err := p.ResultsPrinter(testDomainNoErr, queryTypeNSStr, time.Second, nsResults)
+		if err == nil {
+			t.Error("expected error when full resolution of NS host fails, got nil")
+		}
+	})
+
+	t.Run("Unknown type error", func(t *testing.T) {
+		err := p.ResultsPrinter(testDomainNoErr, "UNKNOWN", time.Second, 12345)
+		if err == nil {
+			t.Error("expected error for unsupported results type int, got nil")
+		}
+	})
+}
+
+func TestRunQueriesEmptyCounts(t *testing.T) {
+	mock := NewMockResolver()
+	p := &Preload{
+		Workers:  1,
+		Quiet:    true,
+		Debug:    true,
+		resolver: mock,
+	}
+	ctx := context.Background()
+	emptyCfg := &confighandlers.Configuration{}
+
+	for _, qtype := range confighandlers.QueryTypes {
+		t.Run("empty "+qtype, func(t *testing.T) {
+			err := p.RunQueries(ctx, qtype, emptyCfg)
+			if err != nil {
+				t.Errorf("RunQueries(%s) with empty config error = %v, want nil", qtype, err)
+			}
+		})
+	}
 }
