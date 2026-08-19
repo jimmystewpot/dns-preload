@@ -26,7 +26,7 @@ jobs:
           go-version: stable
       -
         name: Install Syft
-        run: go install github.com/anchore/syft/cmd/syft@latest
+        run: go install github.com/anchore/syft/cmd/syft@v1.51.0
       - 
         name: Run GoReleaser Release
         uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a
