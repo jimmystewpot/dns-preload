@@ -120,6 +120,7 @@ linters:
           - lll
           - mnd
           - scopelint
+          - goconst
         path: _test\.go
     paths:
       - third_party$
