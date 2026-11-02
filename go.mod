@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/alecthomas/kong v1.17.0
 	github.com/go-playground/validator/v10 v10.30.5
-	golang.org/x/sync v0.23.0
+	golang.org/x/sync v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
